@@ -23,6 +23,13 @@ Dados do negócio (preencher):
 - Elementos: faixa xadrez (toalha de mesa) sob o topo; comandas como cartões de comanda de papel; carimbos PAGA/CANCELADA; itens com pontilhado de cardápio; visor de balança para o peso; botões com sombra sólida.
 - Aba Pesquisar (F3): busca por nº da comanda, item, forma de pagamento, CPF, valor ou motivo de cancelamento, com filtro de status e período.
 
+## Áreas do sistema
+- **Balança (F6):** digita o nº da comanda → Enter → peso em gramas → Enter. O prato entra na comanda (abre a comanda se ainda não existir). Lista das últimas pesagens com "desfazer".
+- **Comandas (F2):** comandas em aberto em cartões; ao abrir uma, lança bebidas/sobremesas pelos quadradinhos por categoria ou pelo código do produto.
+- **Caixa:** abrir o caixa (operador + fundo de troco); receber comanda pelo número ou tocando nela; sangria, suprimento e fechamento com conferência.
+- **Pesquisar (F3)** e **Relatório**.
+- **Configurações:** Produtos da casa (cadastro com nome, categoria, preço, código, ativo e dados fiscais NCM/CFOP/CEST; categorias com nome e cor), Preço do quilo (com histórico), Empresa (nome fantasia, razão social, CNPJ, IE, regime, endereço, telefone, rodapé do cupom), Impressora (modelo, USB/rede/serial, papel 80/58 mm, corte, gaveta, impressão automática, vias, página de teste) e Nota fiscal (passo a passo do que falta e campos da Fase 2).
+
 ## Tecnologia
 - Aplicação web rodando LOCALMENTE no PC do caixa (Windows), para continuar funcionando
   se a internet cair. Pode ser empacotada como app desktop (Electron) ou serviço local.
