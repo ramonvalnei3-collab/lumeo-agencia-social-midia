@@ -1,0 +1,916 @@
+<title>Caixa Altos Sabores</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: faixa laranja da marca no topo com as abas; abaixo, lista de comandas à esquerda e a comanda aberta à direita (empilha no celular).
+   Tema único e deliberado (cores da marca), sempre claro, para tela de caixa. */
+:root {
+  --brand: #C55412;        /* laranja do logo */
+  --brand-dark: #9E410B;
+  --cream: #E5E1D8;        /* creme do logo */
+  --bg: #F7F4EF;
+  --card: #FFFFFF;
+  --ink: #2B1D14;
+  --muted: #7A685B;
+  --line: #E6DED4;
+  --soft: #F1EBE3;
+  --ok: #2F7D4F;
+  --ok-soft: #E3F1E8;
+  --warn: #B7791F;
+  --warn-soft: #FBF1DD;
+  --bad: #B3261E;
+  --bad-soft: #FBE6E4;
+  --display: "Lilita One", "Arial Black", Impact, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--brand); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid #F2A65A; outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- topo ---------- */
+.top { background: var(--brand); color: var(--cream); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; }
+.top-in { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.logo { height: 52px; width: auto; display: block; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.tab { background: transparent; border: 0; color: var(--cream); padding: 8px 14px; border-radius: 8px; font-weight: 600; opacity: .85; }
+.tab:hover { background: rgba(255,255,255,.1); opacity: 1; }
+.tab[aria-current="page"] { background: var(--cream); color: var(--brand-dark); opacity: 1; }
+.status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; background: rgba(0,0,0,.15); padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #9BE3B4; }
+.dot.off { background: #F4A79F; }
+
+.wrap { padding-block: 16px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1320px; margin: 0 auto; }
+.banner { background: var(--warn-soft); border: 1px solid #EFD9A9; color: #6B4A0E; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.h-display { font-family: var(--display); font-weight: 400; letter-spacing: .3px; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+.muted { color: var(--muted); }
+
+.btn { border: 1px solid var(--line); background: var(--card); padding: 10px 14px; border-radius: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+.btn:hover { border-color: #CDBFAF; }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn.primary:hover { background: var(--brand-dark); }
+.btn.ok { background: var(--ok); border-color: var(--ok); color: #fff; }
+.btn.danger { color: var(--bad); }
+.btn.ghost { background: transparent; }
+.btn.big { padding: 14px 18px; font-size: 17px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.kbd { font-family: var(--mono); font-size: 11px; padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,.08); font-weight: 600; }
+.btn.primary .kbd, .btn.ok .kbd { background: rgba(255,255,255,.22); }
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+.input { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 12px; width: 100%; min-width: 0; }
+.input:focus { border-color: var(--brand); outline: none; box-shadow: 0 0 0 3px rgba(197,84,18,.18); }
+.input.big { font-size: 22px; font-weight: 700; padding: 10px 14px; }
+
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.pad { padding: 16px; }
+
+/* ---------- comandas ---------- */
+.pos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 12px; }
+.newbar { display: flex; gap: 8px; }
+.seg { display: flex; background: var(--soft); border-radius: 10px; padding: 3px; gap: 3px; }
+.seg button { flex: 1; border: 0; background: transparent; padding: 8px; border-radius: 8px; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.cmd { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.cmd:hover { border-color: #CDBFAF; }
+.cmd[aria-selected="true"] { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand) inset; }
+.cmd .n { font-family: var(--display); font-size: 28px; line-height: 1; color: var(--brand-dark); }
+.cmd .t { font-weight: 700; font-size: 17px; }
+.cmd .meta { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 12px; }
+
+.detail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); display: flex; flex-direction: column; }
+.d-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.d-head h2 { font-family: var(--display); font-weight: 400; font-size: 30px; color: var(--brand-dark); }
+.weigh { background: var(--soft); padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 170px) minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+.calc { font-size: 15px; padding-bottom: 12px; min-width: 0; }
+.calc b { font-size: 20px; }
+.quick { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.qrow { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.qrow .label { width: 84px; flex-shrink: 0; }
+.qbtn { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; }
+.qbtn:hover { border-color: var(--brand); color: var(--brand-dark); }
+.qbtn small { color: var(--muted); font-weight: 500; margin-left: 4px; }
+.items { list-style: none; margin: 0; padding: 4px 0; max-height: 300px; overflow-y: auto; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--soft); }
+.item .nm { font-weight: 600; }
+.item .sub { font-size: 12px; color: var(--muted); }
+.item .tot { font-weight: 700; min-width: 84px; text-align: right; }
+.qty { display: flex; align-items: center; gap: 2px; }
+.qty button, .x { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-weight: 700; line-height: 1; }
+.x { color: var(--bad); }
+.d-foot { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); }
+.total { display: flex; justify-content: space-between; align-items: baseline; }
+.total .v { font-family: var(--display); font-size: 40px; line-height: 1; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions .grow { flex: 1; }
+
+/* ---------- tabelas / genéricos ---------- */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--soft); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+td.r, th.r { text-align: right; }
+tfoot td { font-weight: 700; border-top: 2px solid var(--line); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.stat { padding: 14px 16px; }
+.stat .v { font-family: var(--display); font-size: 30px; line-height: 1.1; color: var(--brand-dark); }
+.bar { height: 8px; background: var(--soft); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brand); border-radius: 99px; }
+.sect { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+.row > .field { flex: 1; min-width: 140px; }
+.note { font-size: 13px; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 10px 12px; }
+.diff-ok { color: var(--ok); font-weight: 700; }
+.diff-bad { color: var(--bad); font-weight: 700; }
+
+/* ---------- modal ---------- */
+.overlay { position: fixed; inset: 0; background: rgba(43,29,20,.45); display: flex; align-items: center; justify-content: center; z-index: 20; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.modal { background: var(--card); border-radius: 16px; width: min(560px, 100%); max-height: 100%; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.modal.wide { width: min(760px, 100%); }
+.m-head { padding: 16px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.m-head h3 { font-size: 20px; }
+.m-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.m-foot { padding: 14px 18px; border-top: 1px solid var(--line); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.paygrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.payopt { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 12px 8px; font-weight: 700; }
+.payopt[aria-pressed="true"] { border-color: var(--brand); background: #FDF1E9; color: var(--brand-dark); box-shadow: 0 0 0 1px var(--brand) inset; }
+.sumrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sumrow > div { background: var(--soft); border-radius: 10px; padding: 10px 12px; }
+.sumrow .v { font-size: 20px; font-weight: 800; }
+.paylist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.paylist li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; background: var(--soft); border-radius: 10px; }
+.err { color: var(--bad); font-weight: 600; font-size: 14px; }
+
+/* cupom 80mm */
+.paper { background: #FFFEFA; border: 1px solid var(--line); box-shadow: 0 2px 10px rgba(0,0,0,.08); margin: 0 auto; width: min(100%, 340px); padding: 16px 14px; font-family: var(--mono); font-size: 12px; line-height: 1.45; white-space: pre; overflow-x: auto; color: #111; }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 600; z-index: 30; max-width: calc(100% - 32px); }
+.foot { margin-top: 24px; font-size: 13px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .pos { grid-template-columns: minmax(0, 1fr); }
+  .detail { position: static; }
+}
+@media (max-width: 560px) {
+  .logo { height: 40px; }
+  .top-in { gap: 8px 12px; }
+  .status { margin-left: auto; font-size: 12px; padding: 5px 10px; }
+  .tabs { order: 3; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tab { white-space: nowrap; padding: 7px 12px; }
+  .weigh { grid-template-columns: minmax(0, 1fr); }
+  .calc { padding-bottom: 0; }
+  .paygrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sumrow .v { font-size: 16px; }
+  .qrow .label { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <img class="logo" src="logo-header.jpg" alt="Altos Sabores Restaurante">
+    <nav class="tabs" id="tabs" aria-label="Seções"></nav>
+    <div class="status" id="status"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+/* =========================================================
+   Altos Sabores — protótipo da Fase 1 (frente de caixa)
+   Dinheiro sempre em centavos (inteiros). Dados ficam no navegador.
+   ========================================================= */
+const STORE_KEY = 'altos-sabores-pdv-v1';
+const PIN_GERENTE = '1234';
+const FORMAS = [
+  { id: 'dinheiro', nome: 'Dinheiro' },
+  { id: 'debito', nome: 'Débito' },
+  { id: 'credito', nome: 'Crédito' },
+  { id: 'pix', nome: 'Pix' },
+  { id: 'vr', nome: 'Vale-refeição' },
+  { id: 'va', nome: 'Vale-alimentação' },
+];
+const CATS = ['Bebida', 'Sobremesa', 'Outros'];
+
+/* ---------- utilidades ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const brl = c => (c / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const n2 = c => (c / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const kgTxt = g => (g / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+const hora = t => new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+const dataHora = t => new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const uid = () => Math.random().toString(36).slice(2, 10);
+const formaNome = id => (FORMAS.find(f => f.id === id) || { nome: id }).nome;
+function parseMoney(s) {
+  s = String(s ?? '').trim().replace(/[R$\s]/g, '');
+  if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  const v = parseFloat(s);
+  return isFinite(v) ? Math.round(v * 100) : NaN;
+}
+/* preço do prato: gramas × preço do kg, arredondado ao centavo (meio para cima) */
+const precoPrato = (gramas, precoKgCents) => Math.round(gramas * precoKgCents / 1000);
+function desde(t) {
+  const m = Math.max(0, Math.floor((Date.now() - t) / 60000));
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`;
+}
+const inicioDoDia = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
+
+/* ---------- dados de exemplo ---------- */
+function seed() {
+  const now = Date.now(), min = 60000;
+  const P = (nome, cat, reais) => ({ id: uid(), nome, cat, precoCents: Math.round(reais * 100), ativo: true });
+  const produtos = [
+    P('Refrigerante lata 350ml', 'Bebida', 6), P('Refrigerante 600ml', 'Bebida', 8), P('Água mineral 500ml', 'Bebida', 4),
+    P('Água com gás 500ml', 'Bebida', 4.5), P('Suco natural 400ml', 'Bebida', 9), P('Cerveja long neck', 'Bebida', 10),
+    P('Pudim', 'Sobremesa', 8), P('Mousse de maracujá', 'Sobremesa', 7), P('Sorvete (bola)', 'Sobremesa', 6), P('Salada de frutas', 'Sobremesa', 7.5),
+    P('Café', 'Outros', 3), P('Embalagem marmitex', 'Outros', 2),
+  ];
+  const prod = nome => produtos.find(p => p.nome === nome);
+  const kgItem = g => ({ id: uid(), tipo: 'kg', nome: 'Refeição por quilo', gramas: g, qtd: 1, unitCents: 9500, totalCents: precoPrato(g, 9500) });
+  const unItem = (nome, q = 1) => { const p = prod(nome); return { id: uid(), tipo: 'un', produtoId: p.id, nome: p.nome, qtd: q, unitCents: p.precoCents, totalCents: p.precoCents * q }; };
+  const C = (numero, abertaMin, itens, extra = {}) => ({ id: uid(), numero, status: 'aberta', abertaEm: now - abertaMin * min, itens, pagamentos: [], trocoCents: 0, cpf: '', log: [], exemplo: true, ...extra });
+  const comandas = [
+    C(12, 18, [kgItem(507), unItem('Refrigerante lata 350ml')]),
+    C(27, 9, [kgItem(412), unItem('Suco natural 400ml')]),
+    C(31, 4, [kgItem(380), kgItem(655), unItem('Água mineral 500ml', 2)]),
+    C(8, 75, [kgItem(468), unItem('Água mineral 500ml'), unItem('Pudim')], { status: 'fechada', fechadaEm: now - 52 * min, pagamentos: [{ forma: 'pix', valorCents: 5646 }] }),
+    C(15, 63, [kgItem(590), kgItem(321), unItem('Refrigerante 600ml')], { status: 'fechada', fechadaEm: now - 40 * min, pagamentos: [{ forma: 'dinheiro', valorCents: 5000 }, { forma: 'debito', valorCents: 4455 }], trocoCents: 0 }),
+  ];
+  // corrige pagamentos de exemplo para bater com o total
+  comandas.filter(c => c.status === 'fechada').forEach(c => {
+    const tot = totalComanda(c);
+    if (c.pagamentos.length === 1) c.pagamentos[0].valorCents = tot;
+    else c.pagamentos[1].valorCents = tot - c.pagamentos[0].valorCents;
+  });
+  return {
+    config: { precoKgCents: 9500, historicoPreco: [{ em: now - 30 * 864e5, precoKgCents: 9500 }], empresa: 'Altos Sabores Restaurante', cnpj: '00.000.000/0001-00' },
+    produtos, comandas,
+    caixa: { aberto: true, operador: 'Ana', abertoEm: now - 3 * 60 * min, fundoCents: 20000, movimentos: [{ id: uid(), tipo: 'suprimento', valorCents: 5000, motivo: 'Troco extra (moedas)', em: now - 100 * min }] },
+    fechamentos: [],
+  };
+}
+
+/* ---------- estado ---------- */
+let S;
+function load() {
+  try { const raw = localStorage.getItem(STORE_KEY); if (raw) { S = JSON.parse(raw); return; } } catch (e) {}
+  S = seed();
+}
+function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) {} }
+const ui = { tab: 'comandas', lista: 'abertas', sel: null, busca: '' };
+try { const t = localStorage.getItem(STORE_KEY + ':tab'); if (t) ui.tab = t; } catch (e) {}
+
+const totalComanda = c => c.itens.reduce((s, i) => s + i.totalCents, 0);
+const pagoComanda = c => c.pagamentos.reduce((s, p) => s + p.valorCents, 0);
+const abertas = () => S.comandas.filter(c => c.status === 'aberta').sort((a, b) => a.numero - b.numero);
+const fechadasHoje = () => S.comandas.filter(c => c.status !== 'aberta' && (c.fechadaEm || c.canceladaEm) >= inicioDoDia()).sort((a, b) => (b.fechadaEm || b.canceladaEm) - (a.fechadaEm || a.canceladaEm));
+const selecionada = () => S.comandas.find(c => c.id === ui.sel);
+
+/* ---------- toast / modal ---------- */
+let toastTimer;
+function toast(msg) {
+  const r = $('#toast-root'); r.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => r.innerHTML = '', 2600);
+}
+function openModal(html, mount, wide) {
+  const root = $('#modal-root');
+  root.innerHTML = `<div class="overlay" id="ov"><div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true">${html}</div></div>`;
+  $('#ov').addEventListener('mousedown', e => { if (e.target.id === 'ov') closeModal(); });
+  root.querySelectorAll('[data-close]').forEach(b => b.onclick = closeModal);
+  mount && mount(root);
+  const f = root.querySelector('[autofocus]') || root.querySelector('input, button.primary, button.ok');
+  f && f.focus();
+}
+function closeModal() { $('#modal-root').innerHTML = ''; }
+const modalOpen = () => !!$('#modal-root').innerHTML;
+
+function confirmar(titulo, texto, rotulo, onOk, perigo) {
+  openModal(`
+    <div class="m-head"><h3>${esc(titulo)}</h3></div>
+    <div class="m-body"><p style="margin:0">${texto}</p></div>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn ${perigo ? 'danger' : 'primary'}" id="okb">${esc(rotulo)}</button></div>`,
+    r => { $('#okb', r).onclick = () => { closeModal(); onOk(); }; $('#okb', r).focus(); });
+}
+function pedirGerente(titulo, acao, onOk, comMotivo) {
+  openModal(`
+    <div class="m-head"><h3>${esc(titulo)}</h3><button class="btn ghost" data-close aria-label="Fechar">✕</button></div>
+    <form class="m-body" id="pinf">
+      <p style="margin:0">${acao}</p>
+      ${comMotivo ? `<div class="field"><label class="label" for="mot">Motivo</label><input class="input" id="mot" placeholder="Ex.: cliente desistiu da sobremesa"></div>` : ''}
+      <div class="field"><label class="label" for="pin">Senha do gerente</label><input class="input big" id="pin" type="password" inputmode="numeric" autocomplete="off" autofocus></div>
+      <p class="muted" style="margin:0;font-size:13px">No protótipo a senha é <b>1234</b>.</p>
+      <p class="err" id="perr" hidden></p>
+    </form>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" form="pinf" type="submit">Autorizar</button></div>`,
+    r => {
+      $('#pinf', r).onsubmit = e => {
+        e.preventDefault();
+        const motivo = comMotivo ? $('#mot', r).value.trim() : '';
+        if (comMotivo && motivo.length < 5) { $('#perr', r).textContent = 'Escreva o motivo (pelo menos 5 letras).'; $('#perr', r).hidden = false; return; }
+        if ($('#pin', r).value !== PIN_GERENTE) { $('#perr', r).textContent = 'Senha errada. Tente de novo.'; $('#perr', r).hidden = false; $('#pin', r).select(); return; }
+        closeModal(); onOk(motivo);
+      };
+    });
+}
+
+/* ---------- cupom (o que sai na impressora térmica 80mm) ---------- */
+const COL = 40;
+const lin = (ch = '-') => ch.repeat(COL);
+const lr = (l, r) => { l = String(l); r = String(r); const sp = COL - l.length - r.length; return sp >= 1 ? l + ' '.repeat(sp) + r : l.slice(0, COL - r.length - 1) + ' ' + r; };
+const centro = s => { s = String(s); const p = Math.max(0, Math.floor((COL - s.length) / 2)); return ' '.repeat(p) + s; };
+function cupomComanda(c, tipo) {
+  const L = [];
+  L.push(centro(S.config.empresa.toUpperCase()), centro('CNPJ ' + S.config.cnpj), lin());
+  L.push(centro(tipo === 'conf' ? 'CONFERÊNCIA DE CONTA' : 'COMPROVANTE DE PAGAMENTO'));
+  L.push(lr('COMANDA ' + c.numero, dataHora(tipo === 'conf' ? Date.now() : (c.fechadaEm || Date.now())))), L.push(lin());
+  c.itens.forEach(i => {
+    L.push(i.nome.slice(0, COL));
+    if (i.tipo === 'kg') L.push(lr(`  ${kgTxt(i.gramas)} kg x ${n2(i.unitCents)}`, n2(i.totalCents)));
+    else L.push(lr(`  ${i.qtd} un x ${n2(i.unitCents)}`, n2(i.totalCents)));
+  });
+  L.push(lin(), lr('TOTAL', brl(totalComanda(c))));
+  if (tipo !== 'conf') {
+    c.pagamentos.forEach(p => L.push(lr(formaNome(p.forma), n2(p.valorCents))));
+    if (c.trocoCents) L.push(lr('Troco', n2(c.trocoCents)));
+    if (c.cpf) L.push(lr('CPF', c.cpf));
+  }
+  L.push(lin(), centro('*** NÃO É DOCUMENTO FISCAL ***'));
+  if (tipo !== 'conf') L.push(centro('Na Fase 2 aqui sai a NFC-e'), centro('com QR Code da SEFAZ'));
+  L.push('', centro('Obrigado e volte sempre!'));
+  return L.join('\n');
+}
+function verCupom(texto, titulo) {
+  openModal(`
+    <div class="m-head"><h3>${esc(titulo)}</h3><button class="btn ghost" data-close aria-label="Fechar">✕</button></div>
+    <div class="m-body"><div class="paper">${esc(texto)}</div>
+    <p class="note" style="margin:0">Pré-visualização do papel de 80mm. No sistema instalado no computador do caixa, isto vai direto para a impressora térmica, corta o papel e abre a gaveta quando o pagamento tem dinheiro.</p></div>
+    <div class="m-foot"><button class="btn primary" data-close>OK</button></div>`);
+}
+
+/* ---------- topo ---------- */
+const TABS = [['comandas', 'Comandas'], ['caixa', 'Caixa'], ['relatorio', 'Relatório do dia'], ['produtos', 'Produtos'], ['config', 'Configurações']];
+function renderTop() {
+  $('#tabs').innerHTML = TABS.map(([id, nome]) => `<button class="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${nome}</button>`).join('');
+  $('#tabs').querySelectorAll('[data-tab]').forEach(b => b.onclick = () => go(b.dataset.tab));
+  $('#status').innerHTML = S.caixa.aberto
+    ? `<span class="dot"></span>Caixa aberto · ${esc(S.caixa.operador)} · kg ${brl(S.config.precoKgCents)}`
+    : `<span class="dot off"></span>Caixa fechado · kg ${brl(S.config.precoKgCents)}`;
+}
+function go(tab) { ui.tab = tab; try { localStorage.setItem(STORE_KEY + ':tab', tab); } catch (e) {} render(); window.scrollTo(0, 0); }
+function render() {
+  renderTop();
+  const views = { comandas: viewComandas, caixa: viewCaixa, relatorio: viewRelatorio, produtos: viewProdutos, config: viewConfig };
+  (views[ui.tab] || viewComandas)();
+}
+
+/* =========================================================
+   COMANDAS
+   ========================================================= */
+function viewComandas() {
+  const lista = ui.lista === 'abertas' ? abertas() : fechadasHoje();
+  if (!ui.sel || !selecionada()) ui.sel = (abertas()[0] || {}).id || null;
+  const c = selecionada();
+  $('#app').innerHTML = `
+    ${!S.caixa.aberto ? `<div class="banner"><span><b>Caixa fechado.</b> Dá para lançar itens, mas para receber pagamento é preciso abrir o caixa.</span><button class="btn" id="goCaixa">Abrir caixa</button></div>` : ''}
+    <div class="pos">
+      <section class="side" aria-label="Lista de comandas">
+        <form class="newbar" id="newf">
+          <label class="sr" for="newn" hidden>Número da comanda</label>
+          <input class="input big" id="newn" inputmode="numeric" placeholder="Nº da comanda" autocomplete="off">
+          <button class="btn primary" type="submit">Abrir <span class="kbd">F2</span></button>
+        </form>
+        <div class="seg" role="group" aria-label="Filtro">
+          <button data-l="abertas" aria-pressed="${ui.lista === 'abertas'}">Abertas (${abertas().length})</button>
+          <button data-l="fechadas" aria-pressed="${ui.lista === 'fechadas'}">Fechadas hoje (${fechadasHoje().length})</button>
+        </div>
+        ${lista.length ? `<div class="cards">${lista.map(cardComanda).join('')}</div>`
+          : `<div class="empty">${ui.lista === 'abertas' ? 'Nenhuma comanda aberta. Digite o número do cartão acima e aperte Enter.' : 'Nenhuma comanda fechada hoje ainda.'}</div>`}
+      </section>
+      <section class="panel detail" aria-label="Comanda selecionada">${c ? detalhe(c) : `<div class="empty" style="margin:16px">Selecione ou abra uma comanda.</div>`}</section>
+    </div>
+    <p class="foot">Atalhos: <span class="kbd">F2</span> nova comanda · <span class="kbd">F4</span> peso do prato · <span class="kbd">F8</span> receber · <span class="kbd">Esc</span> fechar janela. Protótipo da Fase 1: os dados ficam só neste navegador.</p>`;
+
+  $('#goCaixa') && ($('#goCaixa').onclick = () => go('caixa'));
+  $('#newf').onsubmit = e => { e.preventDefault(); novaComanda($('#newn').value); };
+  document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { ui.lista = b.dataset.l; viewComandas(); });
+  document.querySelectorAll('[data-cmd]').forEach(b => b.onclick = () => { ui.sel = b.dataset.cmd; viewComandas(); if (window.innerWidth <= 900) $('.detail').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  if (c) bindDetalhe(c);
+}
+function cardComanda(c) {
+  const tot = totalComanda(c);
+  const pill = c.status === 'aberta' ? `<span class="pill warn">aberta</span>` : c.status === 'fechada' ? `<span class="pill ok">paga</span>` : `<span class="pill bad">cancelada</span>`;
+  const quando = c.status === 'aberta' ? `há ${desde(c.abertaEm)}` : hora(c.fechadaEm || c.canceladaEm);
+  return `<button class="cmd" data-cmd="${c.id}" aria-selected="${c.id === ui.sel}">
+    <span class="meta"><span>Comanda</span>${pill}</span>
+    <span class="n">${c.numero}</span>
+    <span class="t num">${brl(tot)}</span>
+    <span class="meta"><span>${c.itens.length} ${c.itens.length === 1 ? 'item' : 'itens'}</span><span>${quando}</span></span>
+  </button>`;
+}
+function detalhe(c) {
+  const aberta = c.status === 'aberta';
+  const tot = totalComanda(c);
+  const ativos = S.produtos.filter(p => p.ativo);
+  const head = `<div class="d-head">
+      <div><span class="label">Comanda</span><h2>${c.numero}</h2></div>
+      <div style="text-align:right">
+        ${aberta ? `<span class="pill warn">aberta há ${desde(c.abertaEm)}</span>` : c.status === 'fechada' ? `<span class="pill ok">paga às ${hora(c.fechadaEm)}</span>` : `<span class="pill bad">cancelada</span>`}
+        ${c.exemplo ? `<div class="muted" style="font-size:12px;margin-top:4px">dados de exemplo</div>` : ''}
+      </div></div>`;
+  const pesar = aberta ? `
+    <form class="weigh" id="wf">
+      <div class="field"><label class="label" for="peso">Peso do prato (g)</label><input class="input big num" id="peso" inputmode="numeric" placeholder="507" autocomplete="off"></div>
+      <div class="calc num" id="calc" aria-live="polite"><span class="muted">Digite o peso da balança em gramas. Quilo: ${brl(S.config.precoKgCents)}</span></div>
+      <button class="btn primary" type="submit">Lançar prato <span class="kbd">F4</span></button>
+    </form>
+    <div class="quick">
+      <input class="input" id="busca" placeholder="Buscar bebida, sobremesa ou outro item…" value="${esc(ui.busca)}" autocomplete="off">
+      ${CATS.map(cat => {
+        const ps = ativos.filter(p => p.cat === cat && (!ui.busca || p.nome.toLowerCase().includes(ui.busca.toLowerCase())));
+        return ps.length ? `<div class="qrow"><span class="label">${cat === 'Outros' ? 'Outros' : cat + 's'}</span>${ps.map(p => `<button class="qbtn" data-add="${p.id}">${esc(p.nome)}<small>${n2(p.precoCents)}</small></button>`).join('')}</div>` : '';
+      }).join('') || '<span class="muted">Nenhum produto encontrado.</span>'}
+    </div>` : '';
+  const itens = c.itens.length ? `<ul class="items">${c.itens.map(i => `
+      <li class="item">
+        <div><div class="nm">${esc(i.nome)}</div><div class="sub num">${i.tipo === 'kg' ? `${kgTxt(i.gramas)} kg × ${brl(i.unitCents)}/kg` : `${i.qtd} × ${brl(i.unitCents)}`}</div></div>
+        ${aberta && i.tipo === 'un' ? `<div class="qty"><button data-dec="${i.id}" aria-label="Diminuir">−</button><span class="num" style="min-width:22px;text-align:center">${i.qtd}</span><button data-inc="${i.id}" aria-label="Aumentar">+</button></div>` : '<span></span>'}
+        <div style="display:flex;align-items:center;gap:8px"><span class="tot num">${brl(i.totalCents)}</span>${aberta ? `<button class="x" data-rm="${i.id}" aria-label="Remover ${esc(i.nome)}">✕</button>` : ''}</div>
+      </li>`).join('')}</ul>`
+    : `<div class="empty" style="margin:16px">Comanda vazia. Lance o peso do prato ou escolha um item.</div>`;
+  const pagos = !aberta && c.pagamentos.length ? `<div style="padding:0 16px 8px"><span class="label">Pagamento</span>${c.pagamentos.map(p => `<div class="total num" style="font-size:14px"><span>${formaNome(p.forma)}</span><span>${brl(p.valorCents)}</span></div>`).join('')}${c.trocoCents ? `<div class="total num" style="font-size:14px"><span>Troco</span><span>${brl(c.trocoCents)}</span></div>` : ''}</div>` : '';
+  const acoes = aberta ? `
+      <div class="actions">
+        <button class="btn" id="conf">Imprimir conferência</button>
+        <button class="btn danger ghost" id="cancel">Cancelar comanda</button>
+      </div>
+      <button class="btn ok big" id="pagar" ${!c.itens.length ? 'disabled' : ''}>Receber ${brl(tot)} <span class="kbd">F8</span></button>`
+    : `<div class="actions">
+        ${c.status === 'fechada' ? `<button class="btn" id="comp">Ver comprovante</button>` : ''}
+        <button class="btn grow" id="reabrir">Reabrir comanda (gerente)</button>
+      </div>
+      <p class="note" style="margin:0">Quando a NFC-e estiver ativa (Fase 2), reabrir uma comanda paga vai cancelar a nota antes, dentro do prazo da SEFAZ.</p>`;
+  return `${head}${pesar}${itens}${pagos}<div class="d-foot"><div class="total"><span class="label">Total</span><span class="v num">${brl(tot)}</span></div>${acoes}</div>`;
+}
+function bindDetalhe(c) {
+  const wf = $('#wf');
+  if (wf) {
+    const peso = $('#peso'), calc = $('#calc');
+    peso.oninput = () => {
+      const g = parseInt(peso.value.replace(/\D/g, ''), 10);
+      calc.innerHTML = g > 0
+        ? `${kgTxt(g)} kg × ${brl(S.config.precoKgCents)} = <b>${brl(precoPrato(g, S.config.precoKgCents))}</b>`
+        : `<span class="muted">Digite o peso da balança em gramas. Quilo: ${brl(S.config.precoKgCents)}</span>`;
+    };
+    wf.onsubmit = e => {
+      e.preventDefault();
+      const g = parseInt(peso.value.replace(/\D/g, ''), 10);
+      if (!(g > 0)) { toast('Digite o peso em gramas, ex.: 507'); peso.focus(); return; }
+      if (g > 5000) { toast('Peso acima de 5 kg. Confira se digitou em gramas.'); peso.select(); return; }
+      c.itens.push({ id: uid(), tipo: 'kg', nome: 'Refeição por quilo', gramas: g, qtd: 1, unitCents: S.config.precoKgCents, totalCents: precoPrato(g, S.config.precoKgCents) });
+      save(); viewComandas(); $('#peso') && $('#peso').focus();
+      toast(`Prato de ${kgTxt(g)} kg lançado na comanda ${c.numero}`);
+    };
+    const busca = $('#busca');
+    busca.oninput = () => { ui.busca = busca.value; const pos = busca.selectionStart; viewComandas(); const b = $('#busca'); b.focus(); b.setSelectionRange(pos, pos); };
+  }
+  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
+    const p = S.produtos.find(x => x.id === b.dataset.add);
+    const ex = c.itens.find(i => i.produtoId === p.id && i.unitCents === p.precoCents);
+    if (ex) { ex.qtd++; ex.totalCents = ex.qtd * ex.unitCents; }
+    else c.itens.push({ id: uid(), tipo: 'un', produtoId: p.id, nome: p.nome, qtd: 1, unitCents: p.precoCents, totalCents: p.precoCents });
+    save(); viewComandas();
+  });
+  const mud = (id, d) => {
+    const i = c.itens.find(x => x.id === id); if (!i) return;
+    if (i.qtd + d < 1) return removerItem(c, i);
+    i.qtd += d; i.totalCents = i.qtd * i.unitCents; save(); viewComandas();
+  };
+  document.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => mud(b.dataset.inc, 1));
+  document.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => mud(b.dataset.dec, -1));
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => removerItem(c, c.itens.find(x => x.id === b.dataset.rm)));
+  $('#conf') && ($('#conf').onclick = () => verCupom(cupomComanda(c, 'conf'), `Conferência · comanda ${c.numero}`));
+  $('#comp') && ($('#comp').onclick = () => verCupom(cupomComanda(c, 'pago'), `Comprovante · comanda ${c.numero}`));
+  $('#pagar') && ($('#pagar').onclick = () => abrirPagamento(c));
+  $('#cancel') && ($('#cancel').onclick = () => {
+    if (!c.itens.length) { S.comandas = S.comandas.filter(x => x.id !== c.id); ui.sel = null; save(); render(); toast(`Comanda ${c.numero} descartada (estava vazia)`); return; }
+    pedirGerente('Cancelar comanda ' + c.numero, `A comanda tem ${brl(totalComanda(c))} lançados. O cancelamento fica registrado com o motivo.`, motivo => {
+      c.status = 'cancelada'; c.canceladaEm = Date.now(); c.log.push({ em: Date.now(), acao: 'cancelada', motivo });
+      ui.sel = null; save(); render(); toast(`Comanda ${c.numero} cancelada`);
+    }, true);
+  });
+  $('#reabrir') && ($('#reabrir').onclick = () => {
+    if (abertas().some(x => x.numero === c.numero)) { toast(`Já existe uma comanda ${c.numero} aberta. Feche ela antes.`); return; }
+    pedirGerente('Reabrir comanda ' + c.numero, 'Os pagamentos registrados serão desfeitos e a comanda volta para a lista de abertas.', motivo => {
+      c.log.push({ em: Date.now(), acao: 'reaberta', motivo, pagamentosAnteriores: c.pagamentos });
+      c.status = 'aberta'; c.pagamentos = []; c.trocoCents = 0; delete c.fechadaEm; delete c.canceladaEm;
+      ui.lista = 'abertas'; save(); render(); toast(`Comanda ${c.numero} reaberta`);
+    }, true);
+  });
+}
+function removerItem(c, i) {
+  if (!i) return;
+  confirmar('Remover item', `Remover <b>${esc(i.nome)}</b> (${brl(i.totalCents)}) da comanda ${c.numero}? Fica registrado no histórico.`, 'Remover', () => {
+    c.itens = c.itens.filter(x => x.id !== i.id);
+    c.log.push({ em: Date.now(), acao: 'item removido', item: i.nome, valorCents: i.totalCents, operador: S.caixa.operador || '' });
+    save(); viewComandas(); toast('Item removido');
+  }, true);
+}
+function novaComanda(v) {
+  let n = parseInt(String(v).replace(/\D/g, ''), 10);
+  if (!(n > 0)) n = Math.max(0, ...S.comandas.map(c => c.numero)) + 1;
+  const ex = abertas().find(c => c.numero === n);
+  ui.lista = 'abertas';
+  if (ex) { ui.sel = ex.id; viewComandas(); toast(`Comanda ${n} já estava aberta`); }
+  else {
+    const c = { id: uid(), numero: n, status: 'aberta', abertaEm: Date.now(), itens: [], pagamentos: [], trocoCents: 0, cpf: '', log: [] };
+    S.comandas.push(c); ui.sel = c.id; save(); render(); toast(`Comanda ${n} aberta`);
+  }
+  $('#peso') && $('#peso').focus();
+}
+
+/* ---------- pagamento ---------- */
+function abrirPagamento(c) {
+  if (!S.caixa.aberto) { toast('Abra o caixa antes de receber.'); go('caixa'); return; }
+  if (!c.itens.length) return;
+  const st = { pags: [], forma: 'dinheiro', cpf: c.cpf || '' };
+  const tot = totalComanda(c);
+  const pago = () => st.pags.reduce((s, p) => s + p.valorCents, 0);
+  const falta = () => Math.max(0, tot - pago());
+  const sobra = () => Math.max(0, pago() - tot);
+  const dinheiro = () => st.pags.filter(p => p.forma === 'dinheiro').reduce((s, p) => s + p.valorCents, 0);
+
+  openModal(`
+    <div class="m-head"><h3>Receber · comanda ${c.numero}</h3><button class="btn ghost" data-close aria-label="Fechar">✕</button></div>
+    <div class="m-body">
+      <div class="sumrow num" id="sum"></div>
+      <div class="field"><span class="label">Forma de pagamento</span>
+        <div class="paygrid" id="formas">${FORMAS.map(f => `<button class="payopt" data-f="${f.id}">${f.nome}</button>`).join('')}</div></div>
+      <form class="row" id="addp">
+        <div class="field"><label class="label" for="valor">Valor</label><input class="input big num" id="valor" inputmode="decimal" autocomplete="off"></div>
+        <button class="btn primary" type="submit" style="height:50px">Adicionar</button>
+      </form>
+      <div class="row">
+        <div class="field" style="max-width:150px"><label class="label" for="div">Dividir a conta em</label><input class="input num" id="div" type="number" min="2" max="20" value="2"></div>
+        <button class="btn" id="divb" type="button">Preencher valor por pessoa</button>
+      </div>
+      <ul class="paylist" id="plist"></ul>
+      <div class="field"><label class="label" for="cpf">CPF na nota (opcional)</label><input class="input" id="cpf" inputmode="numeric" placeholder="000.000.000-00" value="${esc(st.cpf)}" autocomplete="off"></div>
+      <p class="err" id="perr" hidden></p>
+    </div>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn ok big" id="fin">Confirmar pagamento</button></div>`, r => {
+    const valor = $('#valor', r);
+    const draw = () => {
+      $('#sum', r).innerHTML = `<div><span class="label">Total</span><div class="v">${brl(tot)}</div></div>
+        <div><span class="label">Pago</span><div class="v">${brl(pago())}</div></div>
+        ${sobra() ? `<div style="background:var(--ok-soft)"><span class="label">Troco</span><div class="v" style="color:var(--ok)">${brl(sobra())}</div></div>`
+                  : `<div style="background:${falta() ? 'var(--warn-soft)' : 'var(--ok-soft)'}"><span class="label">Falta</span><div class="v">${brl(falta())}</div></div>`}`;
+      r.querySelectorAll('[data-f]').forEach(b => b.setAttribute('aria-pressed', b.dataset.f === st.forma));
+      $('#plist', r).innerHTML = st.pags.map((p, k) => `<li><span>${formaNome(p.forma)}</span><span class="num" style="display:flex;gap:10px;align-items:center"><b>${brl(p.valorCents)}</b><button class="x" data-rp="${k}" aria-label="Remover pagamento">✕</button></span></li>`).join('');
+      r.querySelectorAll('[data-rp]').forEach(b => b.onclick = () => { st.pags.splice(+b.dataset.rp, 1); valor.value = n2(falta()); draw(); });
+      $('#fin', r).disabled = falta() > 0;
+    };
+    valor.value = n2(tot);
+    r.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { st.forma = b.dataset.f; draw(); valor.focus(); valor.select(); });
+    $('#addp', r).onsubmit = e => {
+      e.preventDefault(); $('#perr', r).hidden = true;
+      const v = parseMoney(valor.value);
+      if (!(v > 0)) { $('#perr', r).textContent = 'Digite um valor, ex.: 50,00'; $('#perr', r).hidden = false; return; }
+      if (st.forma !== 'dinheiro' && v > falta()) { $('#perr', r).textContent = `${formaNome(st.forma)} não pode passar do que falta (${brl(falta())}). Troco só em dinheiro.`; $('#perr', r).hidden = false; return; }
+      st.pags.push({ forma: st.forma, valorCents: v });
+      valor.value = falta() ? n2(falta()) : ''; draw();
+      (falta() ? valor : $('#fin', r)).focus();
+    };
+    $('#divb', r).onclick = () => { const n = Math.max(2, Math.min(20, parseInt($('#div', r).value, 10) || 2)); valor.value = n2(Math.ceil(tot / n)); valor.focus(); valor.select(); };
+    $('#fin', r).onclick = () => {
+      const troco = sobra();
+      if (troco > dinheiro()) { $('#perr', r).textContent = 'O troco é maior que o dinheiro recebido. Confira os valores.'; $('#perr', r).hidden = false; return; }
+      c.pagamentos = st.pags; c.trocoCents = troco; c.cpf = $('#cpf', r).value.trim();
+      c.status = 'fechada'; c.fechadaEm = Date.now();
+      save(); closeModal(); ui.sel = null; render();
+      verCupom(cupomComanda(c, 'pago'), `Comanda ${c.numero} paga${troco ? ' · troco ' + brl(troco) : ''}`);
+    };
+    draw(); valor.focus(); valor.select();
+  });
+}
+
+/* =========================================================
+   CAIXA
+   ========================================================= */
+function resumoCaixa() {
+  const desdeT = S.caixa.abertoEm || 0;
+  const vendas = S.comandas.filter(c => c.status === 'fechada' && c.fechadaEm >= desdeT);
+  const porForma = Object.fromEntries(FORMAS.map(f => [f.id, 0]));
+  let troco = 0;
+  vendas.forEach(c => { c.pagamentos.forEach(p => porForma[p.forma] += p.valorCents); troco += c.trocoCents || 0; });
+  porForma.dinheiro -= troco;
+  const sup = S.caixa.movimentos.filter(m => m.tipo === 'suprimento').reduce((s, m) => s + m.valorCents, 0);
+  const san = S.caixa.movimentos.filter(m => m.tipo === 'sangria').reduce((s, m) => s + m.valorCents, 0);
+  const totalVendas = vendas.reduce((s, c) => s + totalComanda(c), 0);
+  const esperado = { ...porForma, dinheiro: S.caixa.fundoCents + porForma.dinheiro + sup - san };
+  return { vendas, porForma, sup, san, totalVendas, esperado };
+}
+function viewCaixa() {
+  if (!S.caixa.aberto) {
+    $('#app').innerHTML = `
+      <div class="grid2">
+        <form class="panel pad sect" id="abrirf">
+          <h2 class="h-display" style="font-size:28px;color:var(--brand-dark)">Abrir caixa</h2>
+          <div class="field"><label class="label" for="op">Operador(a)</label><input class="input big" id="op" value="${esc(S.caixa.operador || '')}" placeholder="Nome" autofocus></div>
+          <div class="field"><label class="label" for="fundo">Fundo de troco (dinheiro na gaveta)</label><input class="input big num" id="fundo" inputmode="decimal" value="200,00"></div>
+          <p class="err" id="aerr" hidden></p>
+          <button class="btn primary big" type="submit">Abrir caixa</button>
+        </form>
+        ${historicoFechamentos()}
+      </div>`;
+    $('#abrirf').onsubmit = e => {
+      e.preventDefault();
+      const op = $('#op').value.trim(), f = parseMoney($('#fundo').value);
+      if (!op) { $('#aerr').textContent = 'Digite o nome de quem está no caixa.'; $('#aerr').hidden = false; return; }
+      if (!(f >= 0)) { $('#aerr').textContent = 'Digite o fundo de troco, ex.: 200,00'; $('#aerr').hidden = false; return; }
+      S.caixa = { aberto: true, operador: op, abertoEm: Date.now(), fundoCents: f, movimentos: [] };
+      save(); render(); toast('Caixa aberto');
+    };
+    return;
+  }
+  const R = resumoCaixa();
+  $('#app').innerHTML = `
+    <div class="stats" style="margin-bottom:16px">
+      <div class="panel stat"><span class="label">Aberto por</span><div class="v">${esc(S.caixa.operador)}</div><span class="muted">às ${hora(S.caixa.abertoEm)}</span></div>
+      <div class="panel stat"><span class="label">Vendas no caixa</span><div class="v num">${brl(R.totalVendas)}</div><span class="muted">${R.vendas.length} comandas pagas</span></div>
+      <div class="panel stat"><span class="label">Dinheiro na gaveta</span><div class="v num">${brl(R.esperado.dinheiro)}</div><span class="muted">fundo + dinheiro − sangrias</span></div>
+      <div class="panel stat"><span class="label">Comandas abertas</span><div class="v num">${abertas().length}</div><span class="muted">${brl(abertas().reduce((s, c) => s + totalComanda(c), 0))} a receber</span></div>
+    </div>
+    <div class="grid2">
+      <div class="panel pad sect">
+        <h3>Recebido por forma de pagamento</h3>
+        <div class="tbl-wrap"><table class="num">
+          <thead><tr><th>Forma</th><th class="r">Valor</th></tr></thead>
+          <tbody>${FORMAS.map(f => `<tr><td>${f.nome}${f.id === 'dinheiro' ? ' <span class="muted">(já sem troco)</span>' : ''}</td><td class="r">${brl(R.porForma[f.id])}</td></tr>`).join('')}</tbody>
+          <tfoot><tr><td>Total</td><td class="r">${brl(R.totalVendas)}</td></tr></tfoot>
+        </table></div>
+        <button class="btn primary big" id="fechar">Fechar caixa</button>
+      </div>
+      <div class="panel pad sect">
+        <h3>Sangria e suprimento</h3>
+        <div class="actions"><button class="btn grow" id="sang">Sangria (retirar)</button><button class="btn grow" id="supr">Suprimento (colocar)</button></div>
+        <div class="tbl-wrap"><table class="num">
+          <thead><tr><th>Hora</th><th>Tipo</th><th>Motivo</th><th class="r">Valor</th></tr></thead>
+          <tbody>
+            <tr><td>${hora(S.caixa.abertoEm)}</td><td>Fundo de troco</td><td class="muted">abertura</td><td class="r">${brl(S.caixa.fundoCents)}</td></tr>
+            ${S.caixa.movimentos.map(m => `<tr><td>${hora(m.em)}</td><td>${m.tipo === 'sangria' ? 'Sangria' : 'Suprimento'}</td><td>${esc(m.motivo)}</td><td class="r" style="color:${m.tipo === 'sangria' ? 'var(--bad)' : 'var(--ok)'}">${m.tipo === 'sangria' ? '−' : '+'}${brl(m.valorCents)}</td></tr>`).join('')}
+          </tbody>
+        </table></div>
+      </div>
+      ${historicoFechamentos()}
+    </div>`;
+  $('#sang').onclick = () => movimento('sangria');
+  $('#supr').onclick = () => movimento('suprimento');
+  $('#fechar').onclick = fecharCaixa;
+}
+function movimento(tipo) {
+  const nome = tipo === 'sangria' ? 'Sangria' : 'Suprimento';
+  openModal(`
+    <div class="m-head"><h3>${nome}</h3><button class="btn ghost" data-close aria-label="Fechar">✕</button></div>
+    <form class="m-body" id="mvf">
+      <p class="muted" style="margin:0">${tipo === 'sangria' ? 'Dinheiro retirado da gaveta (ex.: levar ao cofre, pagar fornecedor).' : 'Dinheiro colocado na gaveta (ex.: mais troco).'}</p>
+      <div class="field"><label class="label" for="mv">Valor</label><input class="input big num" id="mv" inputmode="decimal" autofocus autocomplete="off"></div>
+      <div class="field"><label class="label" for="mm">Motivo</label><input class="input" id="mm" placeholder="${tipo === 'sangria' ? 'Ex.: depósito no cofre' : 'Ex.: troco em moedas'}"></div>
+      <p class="err" id="merr" hidden></p>
+    </form>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" type="submit" form="mvf">Registrar ${nome.toLowerCase()}</button></div>`, r => {
+    $('#mvf', r).onsubmit = e => {
+      e.preventDefault();
+      const v = parseMoney($('#mv', r).value), mot = $('#mm', r).value.trim();
+      const er = t => { $('#merr', r).textContent = t; $('#merr', r).hidden = false; };
+      if (!(v > 0)) return er('Digite o valor, ex.: 300,00');
+      if (!mot) return er('Escreva o motivo.');
+      if (tipo === 'sangria' && v > resumoCaixa().esperado.dinheiro) return er('A sangria é maior que o dinheiro que deveria estar na gaveta.');
+      const m = { id: uid(), tipo, valorCents: v, motivo: mot, em: Date.now() };
+      S.caixa.movimentos.push(m); save(); closeModal(); render();
+      verCupom([centro(S.config.empresa.toUpperCase()), lin(), centro(nome.toUpperCase()), lr('Data', dataHora(m.em)), lr('Operador', S.caixa.operador), lr('Valor', brl(v)), 'Motivo: ' + mot, '', '', centro('______________________'), centro('Assinatura')].join('\n'), `${nome} registrada`);
+    };
+  });
+}
+function fecharCaixa() {
+  const ab = abertas();
+  const go2 = () => {
+    const R = resumoCaixa();
+    const linhas = FORMAS.filter(f => R.esperado[f.id] || f.id === 'dinheiro');
+    openModal(`
+      <div class="m-head"><h3>Fechar caixa · conferência</h3><button class="btn ghost" data-close aria-label="Fechar">✕</button></div>
+      <div class="m-body">
+        <p class="muted" style="margin:0">Conte o dinheiro da gaveta e some os comprovantes da maquininha. Digite o que contou; o sistema mostra se sobrou ou faltou.</p>
+        <div class="tbl-wrap"><table class="num">
+          <thead><tr><th>Forma</th><th class="r">Sistema</th><th class="r">Contado</th><th class="r">Diferença</th></tr></thead>
+          <tbody>${linhas.map(f => `<tr><td>${f.nome}</td><td class="r">${brl(R.esperado[f.id])}</td>
+            <td class="r"><input class="input num" style="width:110px;text-align:right;padding:6px 8px" data-ct="${f.id}" inputmode="decimal" value="${n2(R.esperado[f.id])}" aria-label="Contado em ${f.nome}"></td>
+            <td class="r" data-df="${f.id}">${brl(0)}</td></tr>`).join('')}</tbody>
+          <tfoot><tr><td>Total</td><td class="r">${brl(linhas.reduce((s, f) => s + R.esperado[f.id], 0))}</td><td class="r" id="ctTot"></td><td class="r" id="dfTot"></td></tr></tfoot>
+        </table></div>
+        <p class="note" style="margin:0">O dinheiro do sistema já inclui o fundo de troco (${brl(S.caixa.fundoCents)}), suprimentos (${brl(R.sup)}) e desconta sangrias (${brl(R.san)}).</p>
+      </div>
+      <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" id="cfin">Fechar caixa e imprimir</button></div>`, r => {
+      const lerContado = () => Object.fromEntries(linhas.map(f => { const v = parseMoney($(`[data-ct="${f.id}"]`, r).value); return [f.id, isNaN(v) ? 0 : v]; }));
+      const upd = () => {
+        const ct = lerContado(); let td = 0, tc = 0;
+        linhas.forEach(f => {
+          const d = ct[f.id] - R.esperado[f.id]; td += d; tc += ct[f.id];
+          const el = $(`[data-df="${f.id}"]`, r);
+          el.textContent = d === 0 ? 'ok' : (d > 0 ? 'sobra ' : 'falta ') + brl(Math.abs(d));
+          el.className = 'r ' + (d === 0 ? 'diff-ok' : 'diff-bad');
+        });
+        $('#ctTot', r).textContent = brl(tc);
+        $('#dfTot', r).textContent = td === 0 ? 'ok' : (td > 0 ? 'sobra ' : 'falta ') + brl(Math.abs(td));
+        $('#dfTot', r).className = 'r ' + (td === 0 ? 'diff-ok' : 'diff-bad');
+      };
+      r.querySelectorAll('[data-ct]').forEach(i => i.oninput = upd); upd();
+      $('#cfin', r).onclick = () => {
+        const ct = lerContado();
+        const fch = { id: uid(), operador: S.caixa.operador, abertoEm: S.caixa.abertoEm, fechadoEm: Date.now(), fundoCents: S.caixa.fundoCents,
+          sangriasCents: R.san, suprimentosCents: R.sup, totalVendasCents: R.totalVendas, comandas: R.vendas.length,
+          esperado: R.esperado, contado: ct, diferencaCents: linhas.reduce((s, f) => s + ct[f.id] - R.esperado[f.id], 0) };
+        S.fechamentos.unshift(fch);
+        S.caixa = { aberto: false, operador: S.caixa.operador, movimentos: [] };
+        save(); closeModal(); render();
+        const L = [centro(S.config.empresa.toUpperCase()), lin(), centro('FECHAMENTO DE CAIXA'), lr('Operador', fch.operador), lr('Abertura', dataHora(fch.abertoEm)), lr('Fechamento', dataHora(fch.fechadoEm)), lin(),
+          lr('Comandas pagas', fch.comandas), lr('Total de vendas', brl(fch.totalVendasCents)), lr('Fundo de troco', brl(fch.fundoCents)), lr('Suprimentos', brl(fch.suprimentosCents)), lr('Sangrias', brl(R.san)), lin(),
+          lr('FORMA', 'SISTEMA / CONTADO'), ...linhas.map(f => lr(f.nome, `${n2(fch.esperado[f.id])} / ${n2(ct[f.id])}`)), lin(),
+          lr('DIFERENÇA', (fch.diferencaCents > 0 ? '+' : '') + brl(fch.diferencaCents)), '', '', centro('______________________'), centro('Assinatura do operador')];
+        verCupom(L.join('\n'), 'Caixa fechado');
+      };
+    }, true);
+  };
+  if (ab.length) confirmar('Ainda há comandas abertas', `Existem <b>${ab.length}</b> comandas abertas (${ab.map(c => c.numero).join(', ')}). Elas continuam abertas para o próximo caixa. Quer fechar mesmo assim?`, 'Continuar fechamento', go2);
+  else go2();
+}
+function historicoFechamentos() {
+  return `<div class="panel pad sect">
+    <h3>Fechamentos anteriores</h3>
+    ${S.fechamentos.length ? `<div class="tbl-wrap"><table class="num">
+      <thead><tr><th>Fechado em</th><th>Operador</th><th class="r">Vendas</th><th class="r">Diferença</th></tr></thead>
+      <tbody>${S.fechamentos.map(f => `<tr><td>${dataHora(f.fechadoEm)}</td><td>${esc(f.operador)}</td><td class="r">${brl(f.totalVendasCents)}</td><td class="r ${f.diferencaCents ? 'diff-bad' : 'diff-ok'}">${f.diferencaCents ? (f.diferencaCents > 0 ? '+' : '') + brl(f.diferencaCents) : 'ok'}</td></tr>`).join('')}</tbody>
+    </table></div>` : `<p class="muted" style="margin:0">Nenhum fechamento ainda. Eles aparecem aqui com a sobra ou falta de cada dia.</p>`}
+  </div>`;
+}
+
+/* =========================================================
+   RELATÓRIO DO DIA
+   ========================================================= */
+function viewRelatorio() {
+  const hoje = S.comandas.filter(c => c.status === 'fechada' && c.fechadaEm >= inicioDoDia());
+  const tot = hoje.reduce((s, c) => s + totalComanda(c), 0);
+  const gramas = hoje.reduce((s, c) => s + c.itens.filter(i => i.tipo === 'kg').reduce((a, i) => a + i.gramas, 0), 0);
+  const fat = Object.fromEntries(FORMAS.map(f => [f.id, 0]));
+  hoje.forEach(c => { c.pagamentos.forEach(p => fat[p.forma] += p.valorCents); fat.dinheiro -= c.trocoCents || 0; });
+  const prods = {};
+  hoje.forEach(c => c.itens.forEach(i => { const k = i.tipo === 'kg' ? 'Refeição por quilo' : i.nome; prods[k] = prods[k] || { q: 0, v: 0, kg: i.tipo === 'kg' }; prods[k].q += i.tipo === 'kg' ? 1 : i.qtd; prods[k].v += i.totalCents; }));
+  const top = Object.entries(prods).sort((a, b) => b[1].v - a[1].v);
+  const maxF = Math.max(1, ...Object.values(fat));
+  const canc = S.comandas.filter(c => c.status === 'cancelada' && c.canceladaEm >= inicioDoDia());
+  const removidos = S.comandas.flatMap(c => c.log.filter(l => l.em >= inicioDoDia()).map(l => ({ ...l, numero: c.numero })));
+  $('#app').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <div><span class="label">Relatório</span><h2 class="h-display" style="font-size:30px;color:var(--brand-dark)">Hoje, ${new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</h2></div>
+    </div>
+    <div class="stats" style="margin-bottom:16px">
+      <div class="panel stat"><span class="label">Faturamento</span><div class="v num">${brl(tot)}</div></div>
+      <div class="panel stat"><span class="label">Comandas pagas</span><div class="v num">${hoje.length}</div></div>
+      <div class="panel stat"><span class="label">Ticket médio</span><div class="v num">${brl(hoje.length ? Math.round(tot / hoje.length) : 0)}</div></div>
+      <div class="panel stat"><span class="label">Comida vendida</span><div class="v num">${kgTxt(gramas)} kg</div></div>
+    </div>
+    <div class="grid2">
+      <div class="panel pad sect"><h3>Por forma de pagamento</h3>
+        ${FORMAS.map(f => `<div style="display:grid;grid-template-columns:120px minmax(0,1fr) 100px;gap:10px;align-items:center" class="num"><span>${f.nome}</span><div class="bar"><i style="width:${Math.round(100 * Math.max(0, fat[f.id]) / maxF)}%"></i></div><b style="text-align:right">${brl(fat[f.id])}</b></div>`).join('')}
+      </div>
+      <div class="panel pad sect"><h3>O que mais vendeu</h3>
+        ${top.length ? `<div class="tbl-wrap"><table class="num"><thead><tr><th>Item</th><th class="r">Qtd</th><th class="r">Valor</th></tr></thead>
+        <tbody>${top.map(([n, d]) => `<tr><td>${esc(n)}</td><td class="r">${d.q}${d.kg ? ' pratos' : ''}</td><td class="r">${brl(d.v)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Sem vendas hoje ainda.</p>'}
+      </div>
+      <div class="panel pad sect"><h3>Cancelamentos e alterações</h3>
+        ${removidos.length ? `<div class="tbl-wrap"><table><thead><tr><th>Hora</th><th>Comanda</th><th>O quê</th></tr></thead><tbody>
+          ${removidos.sort((a, b) => b.em - a.em).map(l => `<tr><td class="num">${hora(l.em)}</td><td class="num">${l.numero}</td><td>${esc(l.acao)}${l.item ? ': ' + esc(l.item) + ' (' + brl(l.valorCents) + ')' : ''}${l.motivo ? ' · ' + esc(l.motivo) : ''}</td></tr>`).join('')}</tbody></table></div>`
+          : '<p class="muted" style="margin:0">Nada cancelado ou removido hoje.</p>'}
+        ${canc.length ? `<p class="muted" style="margin:0">${canc.length} comanda(s) cancelada(s) hoje.</p>` : ''}
+      </div>
+      <div class="panel pad sect"><h3>Notas fiscais para o contador</h3>
+        <p style="margin:0">Na <b>Fase 3</b> esta tela gera, para qualquer período, o arquivo ZIP com todos os XMLs das NFC-e (autorizadas, canceladas e inutilizadas), mais um resumo em PDF e uma planilha para o contador.</p>
+        <button class="btn" disabled>Exportar XMLs do mês (Fase 3)</button>
+      </div>
+    </div>`;
+}
+
+/* =========================================================
+   PRODUTOS
+   ========================================================= */
+function viewProdutos() {
+  $('#app').innerHTML = `
+    <div class="grid2">
+      <div class="panel pad sect" style="grid-column:1/-1">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:end"><h2 class="h-display" style="font-size:28px;color:var(--brand-dark)">Produtos</h2>
+        <span class="muted">A comida por quilo não entra aqui: o preço do quilo fica em Configurações.</span></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Produto</th><th>Categoria</th><th class="r">Preço</th><th>Ativo</th></tr></thead>
+          <tbody>${S.produtos.map(p => `<tr>
+            <td><input class="input" data-pn="${p.id}" value="${esc(p.nome)}" aria-label="Nome"></td>
+            <td><select class="input" data-pc="${p.id}" aria-label="Categoria">${CATS.map(c => `<option ${c === p.cat ? 'selected' : ''}>${c}</option>`).join('')}</select></td>
+            <td class="r"><input class="input num" style="width:110px;text-align:right" data-pp="${p.id}" inputmode="decimal" value="${n2(p.precoCents)}" aria-label="Preço"></td>
+            <td><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-pa="${p.id}" ${p.ativo ? 'checked' : ''}> ${p.ativo ? 'sim' : 'não'}</label></td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+        <form class="row" id="np">
+          <div class="field"><label class="label" for="npn">Novo produto</label><input class="input" id="npn" placeholder="Ex.: Suco de laranja 300ml"></div>
+          <div class="field" style="max-width:170px"><label class="label" for="npc">Categoria</label><select class="input" id="npc">${CATS.map(c => `<option>${c}</option>`).join('')}</select></div>
+          <div class="field" style="max-width:140px"><label class="label" for="npp">Preço</label><input class="input num" id="npp" inputmode="decimal" placeholder="0,00"></div>
+          <button class="btn primary" type="submit" style="height:44px">Adicionar</button>
+        </form>
+        <p class="note" style="margin:0">Na Fase 2, cada produto ganha os campos fiscais (NCM, CFOP, CSOSN/CST, CEST, origem), preenchidos com a tabela que o contador passar. Bebidas costumam ter substituição tributária.</p>
+      </div>
+    </div>`;
+  const find = id => S.produtos.find(p => p.id === id);
+  document.querySelectorAll('[data-pn]').forEach(i => i.onchange = () => { const v = i.value.trim(); if (v) { find(i.dataset.pn).nome = v; save(); toast('Nome salvo'); } else i.value = find(i.dataset.pn).nome; });
+  document.querySelectorAll('[data-pc]').forEach(i => i.onchange = () => { find(i.dataset.pc).cat = i.value; save(); toast('Categoria salva'); });
+  document.querySelectorAll('[data-pp]').forEach(i => i.onchange = () => { const v = parseMoney(i.value), p = find(i.dataset.pp); if (v > 0) { p.precoCents = v; save(); toast(`${p.nome}: ${brl(v)}`); } i.value = n2(p.precoCents); });
+  document.querySelectorAll('[data-pa]').forEach(i => i.onchange = () => { find(i.dataset.pa).ativo = i.checked; save(); viewProdutos(); });
+  $('#np').onsubmit = e => {
+    e.preventDefault();
+    const nome = $('#npn').value.trim(), v = parseMoney($('#npp').value);
+    if (!nome || !(v > 0)) { toast('Preencha o nome e o preço'); return; }
+    S.produtos.push({ id: uid(), nome, cat: $('#npc').value, precoCents: v, ativo: true }); save(); viewProdutos(); toast('Produto adicionado');
+  };
+}
+
+/* =========================================================
+   CONFIGURAÇÕES
+   ========================================================= */
+function viewConfig() {
+  $('#app').innerHTML = `
+    <div class="grid2">
+      <form class="panel pad sect" id="kgf">
+        <h2 class="h-display" style="font-size:28px;color:var(--brand-dark)">Preço do quilo</h2>
+        <div class="field"><label class="label" for="kg">Valor por kg</label><input class="input big num" id="kg" inputmode="decimal" value="${n2(S.config.precoKgCents)}"></div>
+        <p class="muted num" style="margin:0" id="kgex"></p>
+        <button class="btn primary" type="submit">Salvar preço do quilo</button>
+        <div class="tbl-wrap"><table class="num"><thead><tr><th>Desde</th><th class="r">Preço/kg</th></tr></thead>
+          <tbody>${[...S.config.historicoPreco].reverse().map(h => `<tr><td>${dataHora(h.em)}</td><td class="r">${brl(h.precoKgCents)}</td></tr>`).join('')}</tbody></table></div>
+        <p class="note" style="margin:0">Pratos já lançados mantêm o preço da hora em que foram lançados.</p>
+      </form>
+      <form class="panel pad sect" id="empf">
+        <h3>Dados do restaurante</h3>
+        <div class="field"><label class="label" for="emp">Nome no cupom</label><input class="input" id="emp" value="${esc(S.config.empresa)}"></div>
+        <div class="field"><label class="label" for="cnpj">CNPJ</label><input class="input" id="cnpj" value="${esc(S.config.cnpj)}"></div>
+        <button class="btn" type="submit">Salvar dados</button>
+        <p class="note" style="margin:0">Fase 2: certificado digital A1, CSC da SEFAZ, série e numeração da NFC-e, e ambiente (homologação/produção) entram aqui.</p>
+      </form>
+      <div class="panel pad sect">
+        <h3>Dados deste protótipo</h3>
+        <p class="muted" style="margin:0">Tudo o que você lança fica salvo só neste navegador. Para recomeçar com as comandas de exemplo:</p>
+        <button class="btn danger" id="reset">Apagar tudo e voltar aos exemplos</button>
+      </div>
+    </div>`;
+  const ex = () => { const v = parseMoney($('#kg').value); $('#kgex').textContent = v > 0 ? `Exemplo: prato de 507 g = ${brl(precoPrato(507, v))}` : 'Digite um valor, ex.: 95,00'; };
+  $('#kg').oninput = ex; ex();
+  $('#kgf').onsubmit = e => {
+    e.preventDefault(); const v = parseMoney($('#kg').value);
+    if (!(v > 0)) { toast('Digite um preço válido, ex.: 95,00'); return; }
+    if (v === S.config.precoKgCents) { toast('O preço já é esse'); return; }
+    S.config.precoKgCents = v; S.config.historicoPreco.push({ em: Date.now(), precoKgCents: v }); save(); render(); toast(`Quilo agora: ${brl(v)}`);
+  };
+  $('#empf').onsubmit = e => { e.preventDefault(); S.config.empresa = $('#emp').value.trim() || S.config.empresa; S.config.cnpj = $('#cnpj').value.trim(); save(); toast('Dados salvos'); };
+  $('#reset').onclick = () => confirmar('Apagar tudo?', 'Todas as comandas, fechamentos e produtos deste navegador serão apagados e os exemplos voltam.', 'Apagar e recomeçar', () => { S = seed(); ui.sel = null; save(); go('comandas'); toast('Exemplos restaurados'); }, true);
+}
+
+/* ---------- atalhos ---------- */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modalOpen()) { closeModal(); return; }
+  if (modalOpen()) return;
+  if (e.key === 'F2') { e.preventDefault(); if (ui.tab !== 'comandas') go('comandas'); $('#newn') && $('#newn').focus(); }
+  if (e.key === 'F4') { e.preventDefault(); if (ui.tab !== 'comandas') go('comandas'); $('#peso') ? $('#peso').focus() : toast('Abra ou selecione uma comanda primeiro'); }
+  if (e.key === 'F8') { e.preventDefault(); const c = selecionada(); if (ui.tab === 'comandas' && c && c.status === 'aberta') abrirPagamento(c); }
+});
+setInterval(() => { if (ui.tab === 'comandas' && !modalOpen() && !document.activeElement?.matches('input')) viewComandas(); }, 60000);
+
+load(); render();
+</script>
