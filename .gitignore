@@ -1,0 +1,6 @@
+# Certificados digitais e chaves nunca entram no repositório
+*.pfx
+*.p12
+*.pem
+*.key
+.env
