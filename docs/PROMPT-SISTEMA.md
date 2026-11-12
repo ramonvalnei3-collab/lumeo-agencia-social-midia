@@ -19,7 +19,9 @@ Dados do negócio (preencher):
 - Logo: `docs/logo-altos-sabores.jpg` (letras creme sobre laranja).
 - Cores: laranja da marca `#C55412` (topo e botões principais), laranja escuro `#9E410B`, creme `#E5E1D8`, fundo `#F7F4EF`, texto `#2B1D14`.
 - Verde `#2F7D4F` só para "receber/pago"; vermelho `#B3261E` só para cancelar/remover/falta.
-- Fontes: Lilita One (números grandes e títulos), Figtree (texto).
+- Fontes: Londrina Solid (títulos, números de comanda e totais — desenhada à mão como o logo), Figtree (texto), Share Tech Mono (visor da balança).
+- Elementos: faixa xadrez (toalha de mesa) sob o topo; comandas como cartões de comanda de papel; carimbos PAGA/CANCELADA; itens com pontilhado de cardápio; visor de balança para o peso; botões com sombra sólida.
+- Aba Pesquisar (F3): busca por nº da comanda, item, forma de pagamento, CPF, valor ou motivo de cancelamento, com filtro de status e período.
 
 ## Tecnologia
 - Aplicação web rodando LOCALMENTE no PC do caixa (Windows), para continuar funcionando
