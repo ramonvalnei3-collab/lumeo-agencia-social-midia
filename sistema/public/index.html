@@ -1,0 +1,1860 @@
+<title>Caixa Altos Sabores</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@400;900&family=Figtree:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap">
+<style>
+/* Layout: faixa laranja da marca com o logo e as abas, faixa xadrez (toalha de mesa) logo abaixo.
+   Comandas em "cartões de comanda" quadrados à esquerda; a comanda aberta à direita como um bloco de pedido.
+   Tema único e deliberado com as cores do logo (tela de caixa, sempre clara). */
+:root {
+  --brand: #C55412;        /* laranja do logo */
+  --brand-dark: #8F3A0A;
+  --brand-soft: #F6DCC8;
+  --cream: #E5E1D8;        /* creme do logo */
+  --paper: #FFFBF3;        /* papel da comanda */
+  --bg: #F3EDE3;
+  --ink: #2A1B12;
+  --muted: #76614F;
+  --line: #E2D6C6;
+  --line-strong: #CDBBA5;
+  --soft: #EFE6D9;
+  --ok: #2D7A4B;
+  --ok-soft: #E1F0E6;
+  --warn: #A86A12;
+  --warn-soft: #FBEFD6;
+  --bad: #B0281F;
+  --bad-soft: #FBE4E1;
+  --c-bebida: #2F6E8C;
+  --c-sobremesa: #B8476A;
+  --c-outros: #6E7B33;
+  --lcd: #2A1B12;
+  --lcd-digit: #FFB45E;
+  --display: "Londrina Solid", "Arial Black", Impact, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --digits: "Share Tech Mono", ui-monospace, Menlo, Consolas, monospace;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 6px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--brand); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid #F2A65A; outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.disp { font-family: var(--display); font-weight: 900; letter-spacing: .01em; line-height: 1; }
+svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* ---------- topo ---------- */
+.top { background: var(--brand); color: var(--cream); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; }
+.top-in { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding-block: 8px 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1360px; margin: 0 auto; }
+.logo { height: 62px; width: auto; display: block; margin-bottom: 8px; }
+.tabs { display: flex; gap: 4px; flex: 1; min-width: 0; align-self: flex-end; overflow-x: auto; scrollbar-width: none; }
+.tab { background: transparent; border: 0; color: var(--cream); padding: 10px 16px 12px; border-radius: 10px 10px 0 0; font-family: var(--display); font-weight: 400; font-size: 21px; letter-spacing: .02em; line-height: 1; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.tab:hover { background: rgba(255,255,255,.12); }
+.tab[aria-current="page"] { background: var(--cream); color: var(--brand-dark); }
+.tab .kbd { font-family: var(--mono); font-size: 11px; background: rgba(0,0,0,.14); }
+.tab[aria-current="page"] .kbd { background: rgba(143,58,10,.12); }
+.status { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; background: rgba(0,0,0,.16); padding: 7px 14px; border-radius: 999px; white-space: nowrap; margin-bottom: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #9BE3B4; box-shadow: 0 0 0 3px rgba(155,227,180,.25); }
+.dot.off { background: #F4A79F; box-shadow: 0 0 0 3px rgba(244,167,159,.25); }
+/* toalha xadrez */
+.gingham { height: 14px; background-color: var(--cream);
+  background-image: linear-gradient(90deg, rgba(197,84,18,.5) 50%, transparent 50%), linear-gradient(rgba(197,84,18,.5) 50%, transparent 50%);
+  background-size: 14px 14px; }
+
+.wrap { padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1360px; margin: 0 auto; }
+.banner { background: var(--warn-soft); border: 1.5px solid #EBCB8B; color: #5E400B; padding: 12px 16px; border-radius: var(--r); margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.title { font-family: var(--display); font-weight: 900; font-size: 34px; line-height: 1; color: var(--brand-dark); }
+.h3 { font-family: var(--display); font-weight: 900; font-size: 24px; line-height: 1.05; color: var(--ink); }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 800; }
+.muted { color: var(--muted); }
+
+/* botões com sombra "carimbada" */
+.btn { border: 2px solid var(--ink); background: var(--paper); padding: 10px 16px; border-radius: var(--r); font-weight: 800; display: inline-flex; align-items: center; gap: 8px; justify-content: center; box-shadow: 0 3px 0 var(--ink); transition: transform .06s, box-shadow .06s; }
+.btn:hover { background: #FFF3E3; }
+.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.btn.primary { background: var(--brand); color: #FFF7EC; border-color: var(--brand-dark); box-shadow: 0 3px 0 var(--brand-dark); }
+.btn.primary:hover { background: #B44C10; }
+.btn.ok { background: var(--ok); border-color: #1D5533; color: #fff; box-shadow: 0 4px 0 #1D5533; }
+.btn.ok:hover { background: #276C42; }
+.btn.danger { color: var(--bad); border-color: var(--bad); box-shadow: 0 3px 0 var(--bad); }
+.btn.flat { border-color: transparent; box-shadow: none; background: transparent; }
+.btn.flat:hover { background: var(--soft); }
+.btn.big { padding: 14px 20px; font-size: 19px; }
+.btn.huge { padding: 16px 20px; font-family: var(--display); font-weight: 900; font-size: 28px; letter-spacing: .02em; }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.kbd { font-family: var(--mono); font-size: 12px; padding: 1px 6px; border-radius: 4px; background: rgba(0,0,0,.08); font-weight: 700; letter-spacing: 0; }
+.btn.primary .kbd, .btn.ok .kbd { background: rgba(255,255,255,.22); }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.input { border: 2px solid var(--line-strong); background: #fff; border-radius: var(--r); padding: 10px 12px; width: 100%; min-width: 0; }
+.input:focus { border-color: var(--brand); outline: none; box-shadow: 0 0 0 3px rgba(197,84,18,.18); }
+.input.big { font-size: 24px; font-weight: 800; padding: 10px 14px; }
+
+.panel { background: var(--paper); border: 2px solid var(--line-strong); border-radius: var(--r); }
+.pad { padding: 18px; }
+
+/* ---------- comandas ---------- */
+.pos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 20px; align-items: start; }
+.side { display: flex; flex-direction: column; gap: 14px; }
+.newbar { display: flex; gap: 8px; }
+.newbar .input { font-family: var(--display); font-weight: 900; font-size: 28px; padding: 6px 14px; }
+.newbar .input::placeholder { font-family: var(--body); font-size: 18px; font-weight: 600; color: #A8927C; }
+.seg { display: flex; background: var(--soft); border-radius: var(--r); padding: 4px; gap: 4px; border: 2px solid var(--line); }
+.seg button { flex: 1; border: 0; background: transparent; padding: 8px 10px; border-radius: 4px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 0 var(--line-strong), 0 0 0 1px var(--line-strong); }
+
+/* cartão de comanda */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 14px; }
+.cmd { position: relative; text-align: left; background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r); padding: 0; display: flex; flex-direction: column; overflow: hidden; aspect-ratio: 1 / 1.08; box-shadow: 0 3px 0 var(--ink); transition: transform .08s; }
+.cmd:hover { transform: translateY(-2px); }
+.cmd-top { background: var(--brand); color: var(--cream); font-family: var(--display); font-size: 15px; letter-spacing: .14em; padding: 6px 10px 5px; display: flex; justify-content: space-between; align-items: center; }
+.cmd-top .hole { width: 11px; height: 11px; border-radius: 50%; background: var(--bg); box-shadow: inset 0 1px 2px rgba(0,0,0,.35); }
+.cmd .n { font-family: var(--display); font-weight: 900; font-size: 56px; line-height: .9; color: var(--ink); padding: 8px 10px 0; flex: 1; }
+.cmd-foot { border-top: 2px dashed var(--line-strong); padding: 7px 10px 9px; display: flex; flex-direction: column; gap: 1px; }
+.cmd-foot .t { font-weight: 800; font-size: 18px; }
+.cmd-foot .meta { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
+.cmd[aria-selected="true"] { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand), 0 5px 0 3px var(--brand-dark); }
+.cmd.done .cmd-top { background: #8A7663; }
+.cmd.void .cmd-top { background: #A79A8C; }
+.cmd.void .n, .cmd.void .t { color: #A79A8C; text-decoration: line-through; }
+.stamp { position: absolute; right: 8px; top: 40px; font-family: var(--display); font-weight: 900; font-size: 17px; letter-spacing: .08em; padding: 1px 8px; border: 2.5px solid currentColor; border-radius: 4px; transform: rotate(-9deg); background: rgba(255,251,243,.85); }
+.stamp.ok { color: var(--ok); }
+.stamp.bad { color: var(--bad); }
+.stamp.warn { color: var(--warn); }
+.empty { padding: 30px 18px; text-align: center; color: var(--muted); border: 2px dashed var(--line-strong); border-radius: var(--r); background: var(--paper); }
+
+/* bloco de pedido */
+.detail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 96px); display: flex; flex-direction: column; overflow: hidden; border-color: var(--ink); box-shadow: 0 4px 0 var(--ink); }
+.d-head { background: var(--brand); color: var(--cream); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 18px; flex-wrap: wrap; }
+.d-head .lbl { font-family: var(--display); font-size: 16px; letter-spacing: .16em; opacity: .9; }
+.d-head .big { font-family: var(--display); font-weight: 900; font-size: 54px; line-height: .9; }
+.d-head .when { text-align: right; font-weight: 700; font-size: 14px; }
+.d-head .stamp { position: static; display: inline-block; background: var(--paper); }
+.d-sec { padding: 16px 18px; border-bottom: 2px dashed var(--line-strong); }
+
+/* balança */
+.scale { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: 14px; align-items: stretch; }
+.g-in { display: flex; align-items: center; border: 2px solid var(--ink); border-radius: var(--r); background: #fff; overflow: hidden; }
+.g-in input { border: 0; outline: none; width: 100%; min-width: 0; font-family: var(--display); font-weight: 900; font-size: 40px; padding: 4px 12px; background: transparent; }
+.g-in input::placeholder { color: #D4C3AE; }
+.g-in span { font-family: var(--display); font-size: 22px; color: var(--muted); padding-right: 12px; }
+.g-in:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(197,84,18,.2); }
+.lcd { background: var(--lcd); color: var(--lcd-digit); border-radius: var(--r); padding: 10px 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border: 2px solid #000; box-shadow: inset 0 0 0 3px #3D2A1E; }
+.lcd small { display: block; font-family: var(--body); font-size: 10px; font-weight: 800; letter-spacing: .12em; color: #C9A27D; }
+.lcd b { font-family: var(--digits); font-weight: 400; font-size: 30px; line-height: 1.1; display: block; text-shadow: 0 0 10px rgba(255,180,94,.35); white-space: nowrap; }
+.lcd .tot b { color: #FFE2B8; }
+.scale-actions { grid-column: 1 / -1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.scale-actions .hint { font-size: 13px; color: var(--muted); flex: 1; min-width: 160px; }
+
+/* cardápio de itens (quadradinhos) */
+.picker-top { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.cats { display: flex; gap: 6px; flex-wrap: wrap; }
+.cat { border: 2px solid var(--line-strong); background: var(--paper); border-radius: 999px; padding: 6px 14px; font-weight: 800; font-size: 14px; display: inline-flex; gap: 8px; align-items: center; }
+.cat i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.cat[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.find { flex: 1; min-width: 160px; position: relative; }
+.find svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); width: 18px; height: 18px; }
+.find .input { padding-left: 36px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+.tile { position: relative; text-align: left; background: #fff; border: 2px solid var(--line-strong); border-radius: var(--r); padding: 10px 10px 9px; min-height: 96px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; transition: transform .06s, border-color .1s; }
+.tile:hover { border-color: var(--ink); transform: translateY(-1px); }
+.tile:active { transform: translateY(1px); }
+.tile .sq { width: 12px; height: 12px; border-radius: 2px; }
+.tile-top { display: flex; align-items: center; gap: 6px; }
+.tile .cod { font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 700; }
+.tile .nm { font-weight: 700; font-size: 14px; line-height: 1.2; }
+.tile .pr { font-family: var(--display); font-weight: 900; font-size: 22px; line-height: 1; }
+.tile .cnt { position: absolute; top: 6px; right: 6px; background: var(--brand); color: #fff; font-weight: 800; font-size: 12px; border-radius: 999px; min-width: 22px; height: 22px; display: grid; place-items: center; padding: 0 6px; }
+
+/* itens com pontilhado de cardápio */
+.items { list-style: none; margin: 0; padding: 4px 0; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 18px; }
+.item + .item { border-top: 1px solid var(--soft); }
+.line { display: flex; align-items: baseline; gap: 0; min-width: 0; }
+.line .nm { font-weight: 700; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.line .dots { flex: 1; border-bottom: 2px dotted var(--line-strong); margin: 0 8px; transform: translateY(-4px); min-width: 16px; }
+.line .tot { font-weight: 800; font-size: 17px; white-space: nowrap; }
+.item .sub { font-size: 13px; color: var(--muted); }
+.item .ctl { display: flex; align-items: center; gap: 4px; grid-row: span 2; }
+.qty button, .x { width: 32px; height: 32px; border-radius: var(--r); border: 2px solid var(--line-strong); background: #fff; font-weight: 800; line-height: 1; }
+.qty { display: flex; align-items: center; gap: 2px; }
+.x { color: var(--bad); }
+.x:hover { border-color: var(--bad); }
+.d-foot { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 12px; background: var(--paper); }
+.total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.total .v { font-family: var(--display); font-weight: 900; font-size: 52px; line-height: .95; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions .grow { flex: 1; }
+
+/* ---------- pesquisa ---------- */
+.search-hero { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+.search-box { display: flex; align-items: center; gap: 10px; background: #fff; border: 2.5px solid var(--ink); border-radius: var(--r); padding: 6px 8px 6px 14px; box-shadow: 0 4px 0 var(--ink); }
+.search-box svg { width: 28px; height: 28px; color: var(--brand); }
+.search-box input { border: 0; outline: none; flex: 1; min-width: 0; font-size: 22px; font-weight: 700; padding: 8px 0; background: transparent; }
+.search-box input::placeholder { color: #B59F88; font-weight: 600; }
+.filters { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.filters .seg { flex: 0 1 auto; }
+.res-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.res { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.rcard { text-align: left; background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r); padding: 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 3px 0 var(--ink); position: relative; transition: transform .08s; }
+.rcard:hover { transform: translateY(-2px); }
+.rcard .rtop { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-bottom: 2px dashed var(--line-strong); }
+.rcard .rn { font-family: var(--display); font-weight: 900; font-size: 44px; line-height: .9; min-width: 52px; }
+.rcard .rdate { font-size: 13px; color: var(--muted); font-weight: 600; }
+.rcard .rtot { font-weight: 800; font-size: 19px; }
+.rcard .rbody { padding: 10px 12px 12px; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+.rcard .stamp { position: static; margin-left: auto; font-size: 14px; align-self: flex-start; flex-shrink: 0; }
+mark { background: #FFE0A8; color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* ---------- tabelas / genéricos ---------- */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; align-items: start; }
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--soft); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 800; }
+td.r, th.r { text-align: right; }
+tfoot td { font-weight: 800; border-top: 2px solid var(--ink); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+.stat { padding: 14px 16px; background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r); box-shadow: 0 3px 0 var(--ink); }
+.stat .v { font-family: var(--display); font-weight: 900; font-size: 38px; line-height: 1.05; color: var(--brand-dark); }
+.bar { height: 12px; background: var(--soft); border-radius: 3px; overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; background: var(--brand); }
+.sect { display: flex; flex-direction: column; gap: 14px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+.row > .field { flex: 1; min-width: 140px; }
+.note { font-size: 14px; color: var(--muted); background: var(--soft); border-radius: var(--r); padding: 10px 12px; border: 1px dashed var(--line-strong); }
+.diff-ok { color: var(--ok); font-weight: 800; }
+.diff-bad { color: var(--bad); font-weight: 800; }
+
+/* ---------- modal ---------- */
+.overlay { position: fixed; inset: 0; background: rgba(42,27,18,.5); display: flex; align-items: center; justify-content: center; z-index: 20; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.modal { background: var(--paper); border-radius: var(--r); width: min(580px, 100%); max-height: 100%; overflow-y: auto; border: 2.5px solid var(--ink); box-shadow: 0 6px 0 var(--ink), 0 24px 60px rgba(0,0,0,.3); }
+.modal.wide { width: min(780px, 100%); }
+.m-head { padding: 14px 18px; border-bottom: 2px dashed var(--line-strong); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.m-head h3 { font-family: var(--display); font-weight: 900; font-size: 28px; line-height: 1; color: var(--brand-dark); }
+.m-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.m-foot { padding: 14px 18px; border-top: 2px dashed var(--line-strong); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.paygrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.payopt { border: 2px solid var(--line-strong); background: #fff; border-radius: var(--r); padding: 12px 8px; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 6px; aspect-ratio: 1.5 / 1; justify-content: center; }
+.payopt svg { width: 30px; height: 30px; }
+.payopt[aria-pressed="true"] { border-color: var(--brand); background: #FDEBDD; color: var(--brand-dark); box-shadow: 0 3px 0 var(--brand-dark); }
+.sumrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sumrow > div { background: var(--soft); border-radius: var(--r); padding: 10px 12px; border: 2px solid var(--line); }
+.sumrow .v { font-family: var(--display); font-weight: 900; font-size: 30px; line-height: 1.05; }
+.paylist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.paylist li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; background: #fff; border: 2px solid var(--line); border-radius: var(--r); font-weight: 700; }
+.err { color: var(--bad); font-weight: 700; font-size: 15px; margin: 0; }
+
+/* cupom 80mm com borda serrilhada */
+.paper-wrap { filter: drop-shadow(0 3px 6px rgba(0,0,0,.15)); }
+.paper { background: #FFFEFA; margin: 0 auto; width: min(100%, 350px); padding: 18px 14px 26px; font-family: var(--mono); font-size: 12px; line-height: 1.45; white-space: pre; overflow-x: auto; color: #111;
+  --s: 7px; -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(2 * var(--s)) 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(2 * var(--s)) 100%; }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 12px 18px; border-radius: var(--r); font-weight: 700; z-index: 30; max-width: calc(100% - 32px); box-shadow: 0 4px 0 #000; }
+.foot { margin-top: 26px; font-size: 14px; color: var(--muted); }
+
+/* ---------- balança ---------- */
+.bal { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.bal-main { border-color: var(--ink); box-shadow: 0 4px 0 var(--ink); overflow: hidden; }
+.bal-head { background: var(--brand); color: var(--cream); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bal-head h1 { font-family: var(--display); font-weight: 900; font-size: 42px; line-height: 1; }
+.bal-head .kg { font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
+.bal-head .kg b { font-family: var(--display); font-weight: 900; font-size: 30px; }
+.bal-form { padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; }
+.bal-in { border: 2px solid var(--ink); border-radius: var(--r); background: #fff; font-family: var(--display); font-weight: 900; font-size: 64px; line-height: 1; padding: 6px 14px; width: 100%; min-width: 0; }
+.bal-in::placeholder { color: #D4C3AE; }
+.bal-in:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(197,84,18,.2); }
+.g-in.big input { font-size: 64px; line-height: 1; padding: 6px 14px; }
+.bal-form .lcd, .bal-form .full { grid-column: 1 / -1; }
+.lcd.big { padding: 14px 18px; }
+.lcd.big b { font-size: 46px; }
+.bal-info { grid-column: 1 / -1; border: 2px dashed var(--line-strong); border-radius: var(--r); padding: 10px 14px; min-height: 50px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px; }
+.steps { margin: 0; font-size: 14px; color: var(--muted); padding: 0 20px 18px; }
+.tag { display: inline-block; font-weight: 800; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+.tag.ok { background: var(--ok-soft); color: var(--ok); }
+.tag.new { background: var(--warn-soft); color: var(--warn); }
+.tag.off { background: var(--soft); color: var(--muted); }
+.tag.bad { background: var(--bad-soft); color: var(--bad); }
+.status.alert { background: #FFE7C2; color: var(--brand-dark); }
+.pes { list-style: none; margin: 0; padding: 0; }
+.pes li { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 10px 6px; border-top: 1px solid var(--soft); border-radius: 4px; }
+.pes .pn { font-family: var(--display); font-weight: 900; font-size: 30px; line-height: 1; text-align: center; background: var(--brand); color: var(--cream); border-radius: var(--r); padding: 6px 0 4px; }
+.pes li.closed .pn { background: #8A7663; }
+.pes li.new { animation: flash 1.6s ease-out; }
+@keyframes flash { from { background: #FFE0A8; } to { background: transparent; } }
+
+/* ---------- caixa: receber ---------- */
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 2px solid var(--ink); background: var(--paper); border-radius: var(--r); padding: 6px 10px 5px; display: flex; flex-direction: column; align-items: flex-start; min-width: 78px; box-shadow: 0 2px 0 var(--ink); }
+.chip b { font-family: var(--display); font-weight: 900; font-size: 28px; line-height: 1; }
+.chip span { font-size: 12px; font-weight: 700; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--brand); color: var(--cream); border-color: var(--brand-dark); box-shadow: 0 2px 0 var(--brand-dark); }
+.chip[aria-pressed="true"] span { color: var(--cream); }
+.rbox { border: 2px solid var(--ink); border-radius: var(--r); overflow: hidden; background: #fff; }
+.rbox-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; background: var(--soft); border-bottom: 2px dashed var(--line-strong); flex-wrap: wrap; }
+.rbox-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+.rbox-body .line .nm { font-size: 15px; font-weight: 600; }
+.rbox-body .line .tot { font-size: 15px; }
+.rbox-foot { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; border-top: 2px solid var(--ink); }
+
+.cxg { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.cxside { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+@media (max-width: 980px) { .cxg { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- configurações ---------- */
+.cfg { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; }
+.cfg-nav { display: flex; flex-direction: column; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 112px); }
+.cfg-nav button { text-align: left; border: 2px solid transparent; background: transparent; border-radius: var(--r); padding: 10px 12px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; gap: 8px; white-space: nowrap; }
+.cfg-nav button:hover { background: var(--soft); }
+.cfg-nav button[aria-current="true"] { background: var(--paper); border-color: var(--ink); box-shadow: 0 3px 0 var(--ink); }
+.cfg-nav small { font-weight: 700; color: var(--muted); font-size: 12px; }
+.cfg-body { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px 14px; }
+.form-grid .wide { grid-column: 1 / -1; }
+.cat-head { display: flex; align-items: center; gap: 10px; padding: 16px 4px 6px; border-bottom: 2px solid var(--ink); }
+.cat-head .sq { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+.cat-head h3 { font-family: var(--display); font-weight: 900; font-size: 24px; line-height: 1; }
+.prow { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto auto auto; gap: 12px; align-items: center; padding: 9px 4px; border-bottom: 1px solid var(--soft); }
+.prow .cod { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.prow .pn2 { font-weight: 700; min-width: 0; }
+.prow .pr2 { font-family: var(--display); font-weight: 900; font-size: 22px; }
+.prow.off .pn2 b, .prow.off .pr2 { color: #A79A8C; text-decoration: line-through; }
+.switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; }
+.switch input { appearance: none; -webkit-appearance: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line-strong); position: relative; cursor: pointer; transition: background .15s; margin: 0; flex-shrink: 0; border: 2px solid var(--ink); }
+.switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.switch input:checked { background: var(--ok); }
+.switch input:checked::after { transform: translateX(18px); }
+.catchip { border: 2px solid var(--line-strong); background: #fff; border-radius: var(--r); padding: 8px 12px; font-weight: 800; display: inline-flex; gap: 8px; align-items: center; }
+.catchip:hover { border-color: var(--ink); }
+.catchip i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.catchip small { color: var(--muted); font-weight: 700; }
+.swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+.swatch { width: 32px; height: 32px; border-radius: var(--r); border: 2px solid transparent; }
+.swatch[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 2px #fff inset; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.opt { border: 2px solid var(--line-strong); background: #fff; border-radius: var(--r); padding: 12px; text-align: left; font-weight: 800; display: flex; flex-direction: column; gap: 2px; }
+.opt small { font-weight: 600; color: var(--muted); font-size: 13px; }
+.opt[aria-pressed="true"] { border-color: var(--brand); background: #FDEBDD; box-shadow: 0 3px 0 var(--brand-dark); }
+.toggles { display: flex; flex-direction: column; gap: 12px; }
+.check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.check label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; align-items: start; background: #fff; border: 2px solid var(--line); border-radius: var(--r); padding: 12px; cursor: pointer; }
+.check input { width: 22px; height: 22px; accent-color: var(--ok); margin: 2px 0 0; }
+.check b { display: block; }
+.check small { color: var(--muted); font-size: 14px; }
+.check li.done label { border-color: #B9DCC5; background: var(--ok-soft); }
+.flow { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; }
+.flow > div { flex: 1 1 150px; background: #fff; border: 2px solid var(--ink); border-radius: var(--r); padding: 10px 12px; font-size: 14px; box-shadow: 0 3px 0 var(--ink); }
+.flow > div b { display: block; font-family: var(--display); font-weight: 900; font-size: 21px; line-height: 1.05; color: var(--brand-dark); margin-bottom: 4px; }
+.rules { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+fieldset.locked { border: 2px dashed var(--line-strong); border-radius: var(--r); padding: 14px; margin: 0; opacity: .75; }
+fieldset.locked legend { font-weight: 800; padding: 0 6px; }
+details.note summary { cursor: pointer; font-weight: 800; color: var(--ink); }
+
+/* ---------- entrar / usuário ---------- */
+.sem-login .tabs, .sem-login .status, .sem-login .userbtn { display: none; }
+.entrada { min-height: 60vh; display: grid; place-items: center; padding-block: 24px; }
+.entrada-card { width: min(470px, 100%); padding: 26px; display: flex; flex-direction: column; gap: 14px; border-color: var(--ink); box-shadow: 0 5px 0 var(--ink); }
+.userbtn { border: 2px solid rgba(255,255,255,.4); background: transparent; color: var(--cream); border-radius: 999px; padding: 6px 14px; font-weight: 800; margin-bottom: 8px; white-space: nowrap; font-size: 14px; }
+.userbtn:hover { background: rgba(255,255,255,.12); }
+a.btn { text-decoration: none; }
+@media (max-width: 1180px) { .tab .kbd { display: none; } }
+@media (max-width: 980px) {
+  .bal { grid-template-columns: minmax(0, 1fr); }
+  .cfg { grid-template-columns: minmax(0, 1fr); }
+  .cfg-nav { flex-direction: row; overflow-x: auto; position: static; padding-bottom: 6px; scrollbar-width: none; }
+}
+@media (max-width: 640px) {
+  .bal-form { grid-template-columns: minmax(0, 1fr); padding: 14px; }
+  .bal-in, .g-in.big input { font-size: 48px; }
+  .lcd.big b { font-size: 26px; }
+  .prow { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .prow .cod, .prow .switch { display: none; }
+}
+
+@media (max-width: 980px) {
+  .pos { grid-template-columns: minmax(0, 1fr); }
+  .detail { position: static; }
+}
+@media (max-width: 640px) {
+  .top-in { gap: 6px 12px; }
+  .logo { height: 44px; margin-bottom: 4px; }
+  .status { margin-left: auto; font-size: 12px; padding: 5px 10px; margin-bottom: 4px; }
+  .tabs { order: 3; flex: 1 1 100%; overflow-x: auto; scrollbar-width: none; }
+  .tab { font-size: 18px; padding: 9px 12px 10px; }
+  .tab .kbd { display: none; }
+  .scale { grid-template-columns: minmax(0, 1fr); }
+  .lcd b { font-size: 22px; }
+  .paygrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sumrow .v { font-size: 22px; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .total .v { font-size: 42px; }
+  .title { font-size: 30px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <img class="logo" src="logo-header.jpg" alt="Altos Sabores Restaurante">
+    <nav class="tabs" id="tabs" aria-label="Seções"></nav>
+    <div class="status" id="status"></div>
+    <button class="userbtn" id="userbtn" type="button" aria-label="Minha conta"></button>
+  </div>
+  <div class="gingham" aria-hidden="true"></div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+/* =========================================================
+   Altos Sabores — protótipo da Fase 1 (frente de caixa)
+   Dinheiro sempre em centavos (inteiros). Dados ficam no navegador.
+   ========================================================= */
+const STORE_KEY = 'altos-sabores-pdv-v2';
+const ICON = {
+  dinheiro: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v0M18 14.5v0"/>',
+  debito: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
+  credito: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4M15 15h3"/>',
+  pix: '<path d="M12 2.5l9.5 9.5-9.5 9.5L2.5 12z"/><path d="M8.5 12L12 8.5l3.5 3.5-3.5 3.5z"/>',
+  vr: '<path d="M7 3v18M4.5 3v5a2.5 2.5 0 0 0 5 0V3M17 3c-2.2 2-2.2 7 0 9v9"/>',
+  va: '<path d="M3 5h2.5l2 10h10.5l2-7H7"/><circle cx="10" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>',
+  busca: '<circle cx="11" cy="11" r="7"/><path d="M20.5 20.5l-4.5-4.5"/>',
+};
+const svg = (k, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
+const FORMAS = [
+  { id: 'dinheiro', nome: 'Dinheiro' },
+  { id: 'debito', nome: 'Débito' },
+  { id: 'credito', nome: 'Crédito' },
+  { id: 'pix', nome: 'Pix' },
+  { id: 'vr', nome: 'Vale-refeição' },
+  { id: 'va', nome: 'Vale-alimentação' },
+];
+const PALETA = ['#2F6E8C', '#B8476A', '#6E7B33', '#7A4FA0', '#C08A1E', '#3D7F74', '#A0522D', '#5B6770'];
+const cats = () => S.categorias;
+const corCat = id => (S.categorias.find(c => c.id === id) || { cor: '#8A7663' }).cor;
+/* ---------- utilidades ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const brl = c => (c / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const n2 = c => (c / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const kgTxt = g => (g / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+const hora = t => new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+const dataHora = t => new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const uid = () => Math.random().toString(36).slice(2, 10);
+const formaNome = id => (FORMAS.find(f => f.id === id) || { nome: id }).nome;
+const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+function parseMoney(s) {
+  s = String(s ?? '').trim().replace(/[R$\s]/g, '');
+  if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  const v = parseFloat(s);
+  return isFinite(v) ? Math.round(v * 100) : NaN;
+}
+/* preço do prato: gramas × preço do kg, arredondado ao centavo (meio para cima) */
+const precoPrato = (gramas, precoKgCents) => Math.round(gramas * precoKgCents / 1000);
+function desde(t) {
+  const m = Math.max(0, Math.floor((Date.now() - t) / 60000));
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`;
+}
+const inicioDoDia = (d = 0) => { const x = new Date(); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - d); return x.getTime(); };
+function quandoTxt(t) {
+  if (t >= inicioDoDia()) return 'Hoje, ' + hora(t);
+  if (t >= inicioDoDia(1)) return 'Ontem, ' + hora(t);
+  return new Date(t).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace('.', '') + ', ' + hora(t);
+}
+
+/* ---------- estado ---------- */
+/* ---------- conversa com o servidor ---------- */
+let S = null, versaoLocal = 0, ocupado = false;
+async function api(metodo, url, corpo) {
+  let r;
+  try {
+    r = await fetch(url, { method: metodo, credentials: 'same-origin', headers: metodo === 'GET' ? {} : { 'Content-Type': 'application/json' }, body: metodo === 'GET' ? undefined : JSON.stringify(corpo || {}) });
+  } catch (e) { throw new Error('Sem conexão com o computador do caixa. Confira se o sistema está aberto lá.'); }
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && !url.startsWith('/api/auth/')) { telaLogin('Sua sessão terminou. Entre de novo.'); throw new Error('Entre de novo para continuar.'); }
+  if (!r.ok) throw new Error(d.erro || 'Algo deu errado. Tente de novo.');
+  if (d.estado) aplicarEstado(d.estado);
+  return d;
+}
+function aplicarEstado(e) { S = e; versaoLocal = e.versao; }
+/* roda uma ação no servidor (uma por vez, evita clique duplo) e mostra o erro num aviso */
+async function acao(fn) {
+  if (ocupado) return; ocupado = true;
+  try { await fn(); } catch (e) { toast(e.message); } finally { ocupado = false; }
+}
+const ehGerente = () => !!(S && S.usuario && S.usuario.perfil === 'gerente');
+
+/* ---------- entrar, primeiro acesso ---------- */
+async function iniciar() {
+  let d;
+  try { d = await (await fetch('/api/auth/estado', { credentials: 'same-origin' })).json(); }
+  catch (e) { return telaAviso('Não consegui falar com o sistema', 'Confira se o programa do caixa está aberto e se este computador está na mesma rede.'); }
+  if (!d.usuario) return d.temUsuarios ? telaLogin() : telaPrimeiroAcesso(d.local);
+  try { aplicarEstado(await api('GET', '/api/estado')); } catch (e) { return; }
+  document.body.classList.remove('sem-login');
+  render();
+}
+function telaEntrada(html) {
+  S = null; document.body.classList.add('sem-login'); closeModal();
+  $('#tabs').innerHTML = '';
+  $('#app').innerHTML = `<div class="entrada"><div class="panel entrada-card">${html}</div></div>`;
+}
+function telaAviso(titulo, msg) {
+  telaEntrada(`<h1 class="title">${esc(titulo)}</h1><p style="margin:0">${esc(msg)}</p><div><button class="btn primary big" id="denovo">Tentar de novo</button></div>`);
+  $('#denovo').onclick = () => location.reload();
+}
+function telaLogin(msg) {
+  telaEntrada(`
+    <h1 class="title">Entrar</h1>
+    <p class="muted" style="margin:0">Use o seu e-mail e a sua senha.</p>
+    ${msg ? `<p class="note" style="margin:0">${esc(msg)}</p>` : ''}
+    <form class="sect" id="lf">
+      <div class="field"><label class="label" for="le">E-mail</label><input class="input big" id="le" type="email" autocomplete="username" required></div>
+      <div class="field"><label class="label" for="ls">Senha</label><input class="input big" id="ls" type="password" autocomplete="current-password" required></div>
+      <p class="err" id="lerr" hidden></p>
+      <button class="btn primary huge" type="submit" id="lok">Entrar</button>
+    </form>
+    <p class="muted" style="margin:0;font-size:14px">Esqueceu a senha? O gerente cria uma nova em Configurações → Usuários.</p>`);
+  $('#le').focus();
+  $('#lf').onsubmit = async e => {
+    e.preventDefault(); const b = $('#lok'); b.disabled = true;
+    try { await api('POST', '/api/auth/login', { email: $('#le').value, senha: $('#ls').value }); await iniciar(); }
+    catch (x) { $('#lerr').textContent = x.message; $('#lerr').hidden = false; $('#ls').select(); b.disabled = false; }
+  };
+}
+function telaPrimeiroAcesso(local) {
+  if (!local) return telaAviso('Falta criar o acesso do gerente', 'O primeiro acesso precisa ser criado no computador onde o sistema está instalado, pelo endereço http://localhost:3000.');
+  telaEntrada(`
+    <h1 class="title">Primeiro acesso</h1>
+    <p style="margin:0">Crie o acesso do <b>gerente</b>. Com ele você cadastra os produtos, ajusta o sistema e cria o login de cada funcionário.</p>
+    <form class="sect" id="paf">
+      <div class="field"><label class="label" for="pan">Seu nome</label><input class="input" id="pan" autocomplete="name" required></div>
+      <div class="field"><label class="label" for="pae">E-mail (vai ser o seu login)</label><input class="input" id="pae" type="email" autocomplete="username" required></div>
+      <div class="field"><label class="label" for="pas">Senha</label><input class="input" id="pas" type="password" autocomplete="new-password" required></div>
+      <div class="field"><label class="label" for="pac">Repita a senha</label><input class="input" id="pac" type="password" autocomplete="new-password" required></div>
+      <p class="muted" style="margin:0;font-size:14px">Pelo menos 8 caracteres. A senha fica guardada embaralhada no banco: ninguém consegue ler, nem quem fez o sistema.</p>
+      <p class="err" id="paerr" hidden></p>
+      <button class="btn primary huge" type="submit" id="paok">Criar acesso e entrar</button>
+    </form>`);
+  $('#pan').focus();
+  $('#paf').onsubmit = async e => {
+    e.preventDefault();
+    const er = t => { $('#paerr').textContent = t; $('#paerr').hidden = false; };
+    const senha = $('#pas').value;
+    if (senha.length < 8) return er('A senha precisa ter pelo menos 8 caracteres.');
+    if (senha !== $('#pac').value) return er('As duas senhas não são iguais.');
+    const b = $('#paok'); b.disabled = true;
+    try { await api('POST', '/api/auth/primeiro-acesso', { nome: $('#pan').value, email: $('#pae').value, senha }); await iniciar(); toast('Acesso criado. Bem-vindo!'); }
+    catch (x) { er(x.message); b.disabled = false; }
+  };
+}
+function menuUsuario() {
+  openModal(`
+    <div class="m-head"><h3>${esc(S.usuario.nome)}</h3>${xBtn}</div>
+    <div class="m-body"><p style="margin:0">${esc(S.usuario.email)} · ${ehGerente() ? 'Gerente' : 'Operador'}</p></div>
+    <div class="m-foot"><button class="btn" id="mtroca">Trocar minha senha</button><button class="btn danger" id="msair">Sair</button></div>`, r => {
+    $('#mtroca', r).onclick = () => { closeModal(); ui.cfg = 'conta'; go('config'); };
+    $('#msair', r).onclick = async () => { try { await api('POST', '/api/auth/sair', {}); } catch (e) {} telaLogin('Você saiu do sistema.'); };
+  });
+}
+/* outros computadores (ex.: a balança) mexem nas comandas: confere a cada 4 segundos */
+setInterval(async () => {
+  if (!S || modalOpen() || document.hidden || ocupado) return;
+  try {
+    const d = await (await fetch('/api/versao', { credentials: 'same-origin' })).json();
+    if (!d.versao || d.versao === versaoLocal) return;
+    const ativo = document.activeElement;
+    if (ativo && ativo.matches('input, select, textarea') && ativo.value) return;   // espera terminar de digitar
+    const r = await fetch('/api/estado', { credentials: 'same-origin' });
+    if (!r.ok) return;
+    aplicarEstado(await r.json());
+    const y = window.scrollY; render(); window.scrollTo(0, y);
+  } catch (e) {}
+}, 4000);
+
+const ui = { tab: 'comandas', lista: 'abertas', sel: null, busca: '', cat: 'Bebida', q: '', fStatus: 'todas', fPeriodo: '7', cfg: 'produtos', pq: '', pcat: 'todas', cx: null, bcmd: '', flash: null };
+try { const t = localStorage.getItem(STORE_KEY + ':tab'); if (t) ui.tab = t; } catch (e) {}
+
+const totalComanda = c => c.itens.reduce((s, i) => s + i.totalCents, 0);
+const quandoComanda = c => c.fechadaEm || c.canceladaEm || c.abertaEm;
+const abertas = () => S.comandas.filter(c => c.status === 'aberta').sort((a, b) => a.numero - b.numero);
+const fechadasHoje = () => S.comandas.filter(c => c.status !== 'aberta' && quandoComanda(c) >= inicioDoDia()).sort((a, b) => quandoComanda(b) - quandoComanda(a));
+const selecionada = () => S.comandas.find(c => c.id === ui.sel);
+
+/* ---------- toast / modal ---------- */
+let toastTimer;
+function toast(msg) {
+  const r = $('#toast-root'); r.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => r.innerHTML = '', 2600);
+}
+function openModal(html, mount, wide) {
+  const root = $('#modal-root');
+  root.innerHTML = `<div class="overlay" id="ov"><div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true">${html}</div></div>`;
+  $('#ov').addEventListener('mousedown', e => { if (e.target.id === 'ov') closeModal(); });
+  root.querySelectorAll('[data-close]').forEach(b => b.onclick = closeModal);
+  mount && mount(root);
+  const f = root.querySelector('[autofocus]') || root.querySelector('input, button.primary, button.ok');
+  f && f.focus();
+}
+function closeModal() { $('#modal-root').innerHTML = ''; }
+const modalOpen = () => !!$('#modal-root').innerHTML;
+const xBtn = '<button class="btn flat" data-close aria-label="Fechar">✕</button>';
+
+function confirmar(titulo, texto, rotulo, onOk, perigo) {
+  openModal(`
+    <div class="m-head"><h3>${esc(titulo)}</h3></div>
+    <div class="m-body"><p style="margin:0">${texto}</p></div>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn ${perigo ? 'danger' : 'primary'}" id="okb">${esc(rotulo)}</button></div>`,
+    r => { $('#okb', r).onclick = () => { closeModal(); onOk(); }; $('#okb', r).focus(); });
+}
+function pedirGerente(titulo, acaoTxt, onOk, comMotivo) {
+  const g = ehGerente();
+  openModal(`
+    <div class="m-head"><h3>${esc(titulo)}</h3>${xBtn}</div>
+    <form class="m-body" id="pinf">
+      <p style="margin:0">${acaoTxt}</p>
+      ${comMotivo ? `<div class="field"><label class="label" for="mot">Motivo</label><input class="input" id="mot" placeholder="Ex.: cliente desistiu da sobremesa" autocomplete="off" autofocus></div>` : ''}
+      ${g ? '<p class="muted" style="margin:0;font-size:14px">Você está como gerente, então não precisa de senha.</p>'
+          : `<div class="field"><label class="label" for="pin">Senha de um gerente</label><input class="input big" id="pin" type="password" autocomplete="off" ${comMotivo ? '' : 'autofocus'}></div>`}
+      <p class="err" id="perr" hidden></p>
+    </form>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" form="pinf" type="submit" id="pinok">Autorizar</button></div>`,
+    r => {
+      $('#pinf', r).onsubmit = async e => {
+        e.preventDefault();
+        const er = t => { $('#perr', r).textContent = t; $('#perr', r).hidden = false; };
+        const motivo = comMotivo ? $('#mot', r).value.trim() : '';
+        if (comMotivo && motivo.length < 5) return er('Escreva o motivo (pelo menos 5 letras).');
+        if (!g && !$('#pin', r).value) return er('Digite a senha de um gerente.');
+        const b = $('#pinok', r); b.disabled = true;
+        try { await onOk(motivo, g ? '' : $('#pin', r).value); closeModal(); }
+        catch (x) { er(x.message); b.disabled = false; }
+      };
+    });
+}
+
+/* ---------- cupom (o que sai na impressora térmica 80mm) ---------- */
+const colunas = () => (S.impressora && +S.impressora.papel === 58 ? 32 : 48);
+const lin = (ch = '-') => ch.repeat(colunas());
+const lr = (l, r) => { const COL = colunas(); l = String(l); r = String(r); const sp = COL - l.length - r.length; return sp >= 1 ? l + ' '.repeat(sp) + r : l.slice(0, COL - r.length - 1) + ' ' + r; };
+const centro = s => { const COL = colunas(); s = String(s); const p = Math.max(0, Math.floor((COL - s.length) / 2)); return ' '.repeat(p) + s; };
+function cupomComanda(c, tipo) {
+  const L = [];
+  L.push(...cabecalho());
+  L.push(centro(tipo === 'conf' ? 'CONFERÊNCIA DE CONTA' : 'COMPROVANTE DE PAGAMENTO'));
+  L.push(lr('COMANDA ' + c.numero, dataHora(tipo === 'conf' ? Date.now() : (c.fechadaEm || Date.now())))), L.push(lin());
+  c.itens.forEach(i => {
+    L.push(i.nome.slice(0, colunas()));
+    if (i.tipo === 'kg') L.push(lr(`  ${kgTxt(i.gramas)} kg x ${n2(i.unitCents)}`, n2(i.totalCents)));
+    else L.push(lr(`  ${i.qtd} un x ${n2(i.unitCents)}`, n2(i.totalCents)));
+  });
+  L.push(lin(), lr('TOTAL', brl(totalComanda(c))));
+  if (tipo !== 'conf') {
+    c.pagamentos.forEach(p => L.push(lr(formaNome(p.forma), n2(p.valorCents))));
+    if (c.trocoCents) L.push(lr('Troco', n2(c.trocoCents)));
+    if (c.cpf) L.push(lr('CPF', c.cpf));
+  }
+  L.push(lin(), centro('*** NÃO É DOCUMENTO FISCAL ***'));
+  if (tipo !== 'conf') L.push(centro('Na Fase 2 aqui sai a NFC-e'), centro('com QR Code da SEFAZ'));
+  L.push('', centro(S.config.rodape || ''));
+  return L.join('\n');
+}
+function verCupom(texto, titulo) {
+  openModal(`
+    <div class="m-head"><h3>${esc(titulo)}</h3>${xBtn}</div>
+    <div class="m-body"><div class="paper-wrap"><div class="paper" style="width:min(100%, calc(${colunas()}ch + 28px))">${esc(texto)}</div></div>
+    <p class="note" style="margin:0">Pré-visualização do papel de 80mm. No sistema instalado no computador do caixa, isto vai direto para a impressora térmica, corta o papel e abre a gaveta quando o pagamento tem dinheiro.</p></div>
+    <div class="m-foot"><button class="btn primary" data-close>OK</button></div>`);
+}
+
+/* ---------- topo ---------- */
+const TABS = [['balanca', 'Balança', 'F6'], ['comandas', 'Comandas', 'F2'], ['caixa', 'Caixa'], ['pesquisar', 'Pesquisar', 'F3'], ['relatorio', 'Relatório'], ['config', 'Configurações']];
+function renderTop() {
+  $('#tabs').innerHTML = TABS.map(([id, nome, k]) => `<button class="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${id === 'pesquisar' ? svg('busca') : ''}${nome}${k ? ` <span class="kbd">${k}</span>` : ''}</button>`).join('');
+  $('#tabs').querySelectorAll('[data-tab]').forEach(b => b.onclick = () => go(b.dataset.tab));
+  const ub = $('#userbtn'); ub.textContent = `${S.usuario.nome.split(' ')[0]} · ${ehGerente() ? 'gerente' : 'operador'}`; ub.onclick = menuUsuario;
+  const dc = diasCert();
+  const st = $('#status'); st.classList.toggle('alert', dc !== null && dc <= 30);
+  if (dc !== null && dc <= 30) { st.innerHTML = `<span class="dot off"></span>${dc > 0 ? `Certificado vence em ${dc} ${dc === 1 ? 'dia' : 'dias'}` : 'Certificado vencido'}`; return; }
+  $('#status').innerHTML = S.caixa.aberto
+    ? `<span class="dot"></span>Caixa aberto · ${esc(S.caixa.operador)}`
+    : `<span class="dot off"></span>Caixa fechado`;
+}
+function go(tab) { ui.tab = tab; try { localStorage.setItem(STORE_KEY + ':tab', tab); } catch (e) {} render(); window.scrollTo(0, 0); }
+function render() {
+  renderTop();
+  if (ui.tab === 'produtos') { ui.tab = 'config'; ui.cfg = 'produtos'; }
+  const views = { balanca: viewBalanca, comandas: viewComandas, pesquisar: viewPesquisar, caixa: viewCaixa, relatorio: viewRelatorio, config: viewConfig };
+  (views[ui.tab] || viewComandas)();
+}
+
+/* =========================================================
+   COMANDAS
+   ========================================================= */
+function viewComandas() {
+  const lista = ui.lista === 'abertas' ? abertas() : fechadasHoje();
+  if (!ui.sel || !selecionada()) ui.sel = (abertas()[0] || {}).id || null;
+  const c = selecionada();
+  $('#app').innerHTML = `
+    ${!S.caixa.aberto ? `<div class="banner"><span><b>Caixa fechado.</b> Dá para lançar itens, mas para receber é preciso abrir o caixa.</span><button class="btn" id="goCaixa">Ir para o caixa</button></div>` : ''}
+    <div class="pos">
+      <section class="side" aria-label="Lista de comandas">
+        <form class="newbar" id="newf">
+          <input class="input" id="newn" inputmode="numeric" placeholder="Nº da comanda" autocomplete="off" aria-label="Número da comanda">
+          <button class="btn primary" type="submit">Abrir <span class="kbd">F2</span></button>
+          <button class="btn" type="button" id="goBusca" aria-label="Pesquisar comandas">${svg('busca')}</button>
+        </form>
+        <div class="seg" role="group" aria-label="Filtro">
+          <button data-l="abertas" aria-pressed="${ui.lista === 'abertas'}">Abertas (${abertas().length})</button>
+          <button data-l="fechadas" aria-pressed="${ui.lista === 'fechadas'}">Fechadas hoje (${fechadasHoje().length})</button>
+        </div>
+        ${lista.length ? `<div class="cards">${lista.map(cardComanda).join('')}</div>`
+          : `<div class="empty">${ui.lista === 'abertas' ? 'Nenhuma comanda em aberto.<br>Digite o número do cartão acima ou pese um prato na Balança.' : 'Nenhuma comanda fechada hoje ainda.'}</div>`}
+      </section>
+      <section class="panel detail" aria-label="Comanda selecionada">${c ? detalhe(c) : `<div class="empty" style="margin:18px">Selecione ou abra uma comanda.</div>`}</section>
+    </div>
+    <p class="foot">Atalhos: <span class="kbd">F6</span> balança · <span class="kbd">F2</span> nova comanda · <span class="kbd">F3</span> pesquisar · <span class="kbd">F4</span> peso do prato · <span class="kbd">F8</span> receber · <span class="kbd">Esc</span> fechar janela. Tudo fica salvo no computador do caixa.</p>`;
+
+  $('#goCaixa') && ($('#goCaixa').onclick = () => go('caixa'));
+  $('#goBusca').onclick = () => go('pesquisar');
+  $('#newf').onsubmit = e => { e.preventDefault(); novaComanda($('#newn').value); };
+  document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { ui.lista = b.dataset.l; viewComandas(); });
+  document.querySelectorAll('[data-cmd]').forEach(b => b.onclick = () => { ui.sel = b.dataset.cmd; viewComandas(); if (window.innerWidth <= 980) $('.detail').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  if (c) bindDetalhe(c);
+}
+function stampDe(c) {
+  return c.status === 'fechada' ? `<span class="stamp ok">PAGA</span>` : c.status === 'cancelada' ? `<span class="stamp bad">CANCELADA</span>` : '';
+}
+function cardComanda(c) {
+  const tot = totalComanda(c);
+  const quando = c.status === 'aberta' ? desde(c.abertaEm) : hora(quandoComanda(c));
+  const cls = c.status === 'fechada' ? 'done' : c.status === 'cancelada' ? 'void' : '';
+  return `<button class="cmd ${cls}" data-cmd="${c.id}" aria-selected="${c.id === ui.sel}" aria-label="Comanda ${c.numero}, ${brl(tot)}">
+    <span class="cmd-top"><span>COMANDA</span><span class="hole"></span></span>
+    <span class="n">${c.numero}</span>
+    ${stampDe(c)}
+    <span class="cmd-foot"><span class="t num">${brl(tot)}</span><span class="meta"><span>${c.itens.length} ${c.itens.length === 1 ? 'item' : 'itens'}</span><span>${quando}</span></span></span>
+  </button>`;
+}
+function detalhe(c) {
+  if (!cats().some(k => k.id === ui.cat)) ui.cat = (cats()[0] || {}).id;
+  const aberta = c.status === 'aberta';
+  const tot = totalComanda(c);
+  const head = `<div class="d-head">
+      <div><div class="lbl">COMANDA</div><div class="big">${c.numero}</div></div>
+      <div class="when">
+        ${aberta ? `aberta há ${desde(c.abertaEm)}<br><span style="opacity:.8">desde ${hora(c.abertaEm)}</span>` : stampDe(c) + `<div style="margin-top:6px">${quandoTxt(quandoComanda(c))}</div>`}
+        ${c.exemplo ? `<div style="opacity:.75;font-size:12px;margin-top:2px">dados de exemplo</div>` : ''}
+      </div></div>`;
+  const pesar = aberta ? `
+    <form class="d-sec scale" id="wf">
+      <div class="field"><label class="label" for="peso">Peso do prato</label>
+        <div class="g-in"><input id="peso" class="num" inputmode="numeric" placeholder="507" autocomplete="off"><span>g</span></div></div>
+      <div class="lcd num" aria-live="polite">
+        <div><small>PESO kg</small><b id="lcdKg">0,000</b></div>
+        <div><small>R$ / kg</small><b>${n2(S.config.precoKgCents)}</b></div>
+        <div class="tot"><small>TOTAL R$</small><b id="lcdTot">0,00</b></div>
+      </div>
+      <div class="scale-actions">
+        <span class="hint">Digite o peso da balança em gramas e aperte Enter.</span>
+        <button class="btn primary big" type="submit">Lançar prato <span class="kbd">F4</span></button>
+      </div>
+    </form>
+    <div class="d-sec">
+      <div class="picker-top">
+        <div class="cats" role="group" aria-label="Categoria">
+          ${cats().map(k => `<button class="cat" data-cat="${k.id}" aria-pressed="${!ui.busca && ui.cat === k.id}"><i style="background:${k.cor}"></i>${esc(k.nome)}</button>`).join('')}
+        </div>
+        <div class="find">${svg('busca')}<input class="input" id="busca" placeholder="Buscar item ou código…" value="${esc(ui.busca)}" autocomplete="off" aria-label="Buscar item"></div>
+      </div>
+      <div class="tiles" id="tiles">${tilesHtml(c)}</div>
+    </div>` : '';
+  const itens = c.itens.length ? `<ul class="items">${c.itens.map(i => `
+      <li class="item">
+        <div class="line"><span class="nm">${esc(i.nome)}</span><span class="dots"></span><span class="tot num">${brl(i.totalCents)}</span></div>
+        <div class="ctl">
+          ${aberta && i.tipo === 'un' ? `<div class="qty"><button data-dec="${i.id}" aria-label="Diminuir">−</button><span class="num" style="min-width:24px;text-align:center;font-weight:800">${i.qtd}</span><button data-inc="${i.id}" aria-label="Aumentar">+</button></div>` : ''}
+          ${aberta ? `<button class="x" data-rm="${i.id}" aria-label="Remover ${esc(i.nome)}">✕</button>` : ''}
+        </div>
+        <div class="sub num">${i.tipo === 'kg' ? `${kgTxt(i.gramas)} kg × ${brl(i.unitCents)}/kg` : `${i.qtd} × ${brl(i.unitCents)}`}</div>
+      </li>`).join('')}</ul>`
+    : `<div class="empty" style="margin:18px">Comanda vazia. Lance o peso do prato ou toque num item.</div>`;
+  const pagos = !aberta && c.pagamentos.length ? `<div class="d-sec" style="border-top:2px dashed var(--line-strong)"><span class="label">Pagamento</span>${c.pagamentos.map(p => `<div class="line num" style="margin-top:4px"><span>${formaNome(p.forma)}</span><span class="dots"></span><b>${brl(p.valorCents)}</b></div>`).join('')}${c.trocoCents ? `<div class="line num"><span>Troco</span><span class="dots"></span><b>${brl(c.trocoCents)}</b></div>` : ''}${c.cpf ? `<div class="line num"><span>CPF</span><span class="dots"></span><span>${esc(c.cpf)}</span></div>` : ''}</div>` : '';
+  const acoes = aberta ? `
+      <button class="btn ok huge" id="pagar" ${!c.itens.length ? 'disabled' : ''}>Receber ${brl(tot)} <span class="kbd">F8</span></button>
+      <div class="actions">
+        <button class="btn grow" id="conf">Imprimir conferência</button>
+        <button class="btn danger" id="cancel">Cancelar comanda</button>
+      </div>`
+    : `<div class="actions">
+        ${c.status === 'fechada' ? `<button class="btn grow" id="comp">Ver comprovante</button>` : ''}
+        <button class="btn grow" id="reabrir">Reabrir comanda (gerente)</button>
+      </div>
+      <p class="note" style="margin:0">Quando a NFC-e estiver ativa (Fase 2), reabrir uma comanda paga vai cancelar a nota antes, dentro do prazo da SEFAZ.</p>`;
+  return `${head}${pesar}${itens}${pagos}<div class="d-foot" style="border-top:2px solid var(--ink)"><div class="total"><span class="h3">Total</span><span class="v num">${brl(tot)}</span></div>${acoes}</div>`;
+}
+function tilesHtml(c) {
+  const q = norm(ui.busca.trim());
+  const ps = S.produtos.filter(p => p.ativo && (q ? (norm(p.nome).includes(q) || (p.codigo && p.codigo === ui.busca.trim())) : p.cat === ui.cat));
+  if (!ps.length) return `<span class="muted">Nenhum item encontrado${q ? ` para “${esc(ui.busca)}”` : ''}.</span>`;
+  return ps.map(p => {
+    const n = c.itens.filter(i => i.produtoId === p.id).reduce((s, i) => s + i.qtd, 0);
+    return `<button class="tile" data-add="${p.id}"><span class="tile-top"><span class="sq" style="background:${corCat(p.cat)}"></span>${p.codigo ? `<span class="cod">${esc(p.codigo)}</span>` : ''}</span>${n ? `<span class="cnt">${n}</span>` : ''}<span class="nm">${esc(p.nome)}</span><span class="pr num">${n2(p.precoCents)}</span></button>`;
+  }).join('');
+}
+function bindTiles(c) {
+  document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => acao(async () => {
+    await api('POST', `/api/comandas/${c.id}/itens`, { tipo: 'un', produtoId: b.dataset.add });
+    const y = window.scrollY; viewComandas(); window.scrollTo(0, y);
+  }));
+}
+function bindDetalhe(c) {
+  const wf = $('#wf');
+  if (wf) {
+    const peso = $('#peso');
+    peso.oninput = () => {
+      const g = parseInt(peso.value.replace(/\D/g, ''), 10);
+      $('#lcdKg').textContent = g > 0 ? kgTxt(g) : '0,000';
+      $('#lcdTot').textContent = g > 0 ? n2(precoPrato(g, S.config.precoKgCents)) : '0,00';
+    };
+    wf.onsubmit = e => {
+      e.preventDefault();
+      const g = parseInt(peso.value.replace(/\D/g, ''), 10);
+      if (!(g > 0)) { toast('Digite o peso em gramas, ex.: 507'); peso.focus(); return; }
+      if (g > 5000) { toast('Peso acima de 5 kg. Confira se digitou em gramas.'); peso.select(); return; }
+      acao(async () => { await api('POST', `/api/comandas/${c.id}/itens`, { tipo: 'kg', gramas: g }); viewComandas(); $('#peso') && $('#peso').focus(); toast(`Prato de ${kgTxt(g)} kg lançado na comanda ${c.numero}`); });
+    };
+    $('#busca').oninput = e => { ui.busca = e.target.value; $('#tiles').innerHTML = tilesHtml(c); document.querySelectorAll('[data-cat]').forEach(b => b.setAttribute('aria-pressed', !ui.busca && ui.cat === b.dataset.cat)); bindTiles(c); };
+    document.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => { ui.cat = b.dataset.cat; ui.busca = ''; $('#busca').value = ''; $('#tiles').innerHTML = tilesHtml(c); document.querySelectorAll('[data-cat]').forEach(x => x.setAttribute('aria-pressed', x === b)); bindTiles(c); });
+    bindTiles(c);
+  }
+  const mud = (id, d) => {
+    const i = c.itens.find(x => x.id === id); if (!i) return;
+    if (i.qtd + d < 1) return removerItem(c, i);
+    acao(async () => { await api('PATCH', `/api/itens/${id}`, { qtd: i.qtd + d }); const y = window.scrollY; viewComandas(); window.scrollTo(0, y); });
+  };
+  document.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => mud(b.dataset.inc, 1));
+  document.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => mud(b.dataset.dec, -1));
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => removerItem(c, c.itens.find(x => x.id === b.dataset.rm)));
+  $('#conf') && ($('#conf').onclick = () => verCupom(cupomComanda(c, 'conf'), `Conferência · comanda ${c.numero}`));
+  $('#comp') && ($('#comp').onclick = () => verCupom(cupomComanda(c, 'pago'), `Comprovante · comanda ${c.numero}`));
+  $('#pagar') && ($('#pagar').onclick = () => abrirPagamento(c));
+  $('#cancel') && ($('#cancel').onclick = () => {
+    if (!c.itens.length) { acao(async () => { await api('DELETE', `/api/comandas/${c.id}`, {}); ui.sel = null; render(); toast(`Comanda ${c.numero} descartada (estava vazia)`); }); return; }
+    pedirGerente('Cancelar comanda ' + c.numero, `A comanda tem ${brl(totalComanda(c))} lançados. O cancelamento fica registrado com o motivo.`, async (motivo, senha) => {
+      await api('POST', `/api/comandas/${c.id}/cancelar`, { motivo, senhaGerente: senha });
+      ui.sel = null; render(); toast(`Comanda ${c.numero} cancelada`);
+    }, true);
+  });
+  $('#reabrir') && ($('#reabrir').onclick = () => {
+    if (abertas().some(x => x.numero === c.numero)) { toast(`Já existe uma comanda ${c.numero} aberta. Feche ela antes.`); return; }
+    pedirGerente('Reabrir comanda ' + c.numero, 'Os pagamentos registrados serão desfeitos e a comanda volta para a lista de abertas.', async (motivo, senha) => {
+      await api('POST', `/api/comandas/${c.id}/reabrir`, { motivo, senhaGerente: senha });
+      ui.lista = 'abertas'; render(); toast(`Comanda ${c.numero} reaberta`);
+    }, true);
+  });
+}
+function removerItem(c, i) {
+  if (!i) return;
+  confirmar('Remover item', `Remover <b>${esc(i.nome)}</b> (${brl(i.totalCents)}) da comanda ${c.numero}? Fica registrado no histórico.`, 'Remover', () => acao(async () => {
+    await api('DELETE', `/api/itens/${i.id}`, {});
+    viewComandas(); toast('Item removido');
+  }), true);
+}
+function novaComanda(v) {
+  let n = parseInt(String(v).replace(/\D/g, ''), 10);
+  if (!(n > 0)) n = Math.max(0, ...abertas().map(c => c.numero)) + 1;
+  const ex = abertas().find(c => c.numero === n);
+  ui.lista = 'abertas';
+  if (ex) { ui.sel = ex.id; viewComandas(); toast(`Comanda ${n} já estava aberta`); }
+  else {
+    acao(async () => { const d = await api('POST', '/api/comandas', { numero: n }); ui.sel = d.id; render(); toast(`Comanda ${n} aberta`); $('#peso') && $('#peso').focus(); });
+    return;
+  }
+  $('#peso') && $('#peso').focus();
+}
+
+/* ---------- pagamento ---------- */
+function abrirPagamento(c) {
+  if (!S.caixa.aberto) { toast('Abra o caixa antes de receber.'); go('caixa'); return; }
+  if (!c.itens.length) return;
+  const st = { pags: [], forma: 'dinheiro', cpf: c.cpf || '' };
+  const tot = totalComanda(c);
+  const pago = () => st.pags.reduce((s, p) => s + p.valorCents, 0);
+  const falta = () => Math.max(0, tot - pago());
+  const sobra = () => Math.max(0, pago() - tot);
+  const dinheiro = () => st.pags.filter(p => p.forma === 'dinheiro').reduce((s, p) => s + p.valorCents, 0);
+
+  openModal(`
+    <div class="m-head"><h3>Receber · comanda ${c.numero}</h3>${xBtn}</div>
+    <div class="m-body">
+      <div class="sumrow num" id="sum"></div>
+      <div class="field"><span class="label">Forma de pagamento</span>
+        <div class="paygrid" id="formas">${FORMAS.map(f => `<button class="payopt" data-f="${f.id}">${svg(f.id)}${f.nome}</button>`).join('')}</div></div>
+      <form class="row" id="addp">
+        <div class="field"><label class="label" for="valor">Valor</label><input class="input big num" id="valor" inputmode="decimal" autocomplete="off"></div>
+        <button class="btn primary big" type="submit">Adicionar</button>
+      </form>
+      <div class="row">
+        <div class="field" style="max-width:160px"><label class="label" for="div">Dividir a conta em</label><input class="input num" id="div" type="number" min="2" max="20" value="2"></div>
+        <button class="btn" id="divb" type="button">Valor por pessoa</button>
+      </div>
+      <ul class="paylist" id="plist"></ul>
+      <div class="field"><label class="label" for="cpf">CPF na nota (opcional)</label><input class="input" id="cpf" inputmode="numeric" placeholder="000.000.000-00" value="${esc(st.cpf)}" autocomplete="off"></div>
+      <p class="err" id="perr" hidden></p>
+    </div>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn ok big" id="fin">Confirmar pagamento</button></div>`, r => {
+    const valor = $('#valor', r);
+    const draw = () => {
+      $('#sum', r).innerHTML = `<div><span class="label">Total</span><div class="v">${brl(tot)}</div></div>
+        <div><span class="label">Pago</span><div class="v">${brl(pago())}</div></div>
+        ${sobra() ? `<div style="background:var(--ok-soft);border-color:#B9DCC5"><span class="label">Troco</span><div class="v" style="color:var(--ok)">${brl(sobra())}</div></div>`
+                  : `<div style="background:${falta() ? 'var(--warn-soft)' : 'var(--ok-soft)'}"><span class="label">Falta</span><div class="v">${brl(falta())}</div></div>`}`;
+      r.querySelectorAll('[data-f]').forEach(b => b.setAttribute('aria-pressed', b.dataset.f === st.forma));
+      $('#plist', r).innerHTML = st.pags.map((p, k) => `<li><span style="display:flex;gap:8px;align-items:center">${svg(p.forma)}${formaNome(p.forma)}</span><span class="num" style="display:flex;gap:10px;align-items:center"><b>${brl(p.valorCents)}</b><button class="x" data-rp="${k}" aria-label="Remover pagamento">✕</button></span></li>`).join('');
+      r.querySelectorAll('[data-rp]').forEach(b => b.onclick = () => { st.pags.splice(+b.dataset.rp, 1); valor.value = n2(falta()); draw(); });
+      $('#fin', r).disabled = falta() > 0;
+    };
+    valor.value = n2(tot);
+    r.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { st.forma = b.dataset.f; draw(); valor.focus(); valor.select(); });
+    $('#addp', r).onsubmit = e => {
+      e.preventDefault(); $('#perr', r).hidden = true;
+      const v = parseMoney(valor.value);
+      if (!(v > 0)) { $('#perr', r).textContent = 'Digite um valor, ex.: 50,00'; $('#perr', r).hidden = false; return; }
+      if (st.forma !== 'dinheiro' && v > falta()) { $('#perr', r).textContent = `${formaNome(st.forma)} não pode passar do que falta (${brl(falta())}). Troco só em dinheiro.`; $('#perr', r).hidden = false; return; }
+      st.pags.push({ forma: st.forma, valorCents: v });
+      valor.value = falta() ? n2(falta()) : ''; draw();
+      (falta() ? valor : $('#fin', r)).focus();
+    };
+    $('#divb', r).onclick = () => { const n = Math.max(2, Math.min(20, parseInt($('#div', r).value, 10) || 2)); valor.value = n2(Math.ceil(tot / n)); valor.focus(); valor.select(); };
+    $('#fin', r).onclick = async () => {
+      const troco = sobra();
+      if (troco > dinheiro()) { $('#perr', r).textContent = 'O troco é maior que o dinheiro recebido. Confira os valores.'; $('#perr', r).hidden = false; return; }
+      const b = $('#fin', r); b.disabled = true;
+      let d;
+      try { d = await api('POST', `/api/comandas/${c.id}/pagar`, { pagamentos: st.pags, cpf: $('#cpf', r).value.trim() }); }
+      catch (x) { $('#perr', r).textContent = x.message; $('#perr', r).hidden = false; b.disabled = false; return; }
+      closeModal(); ui.sel = null; ui.cx = null; render();
+      const pc = S.comandas.find(x => x.id === c.id) || c;
+      const tit = `Comanda ${c.numero} paga${d.trocoCents ? ' · troco ' + brl(d.trocoCents) : ''}`;
+      if (S.impressora.autoImprimir) verCupom(cupomComanda(pc, 'pago'), tit); else toast(tit);
+    };
+    draw(); valor.focus(); valor.select();
+  });
+}
+
+/* =========================================================
+   PESQUISAR
+   ========================================================= */
+const STATUS_NOME = { aberta: 'aberta', fechada: 'paga', cancelada: 'cancelada' };
+function casa(c, qRaw) {
+  const q = norm(qRaw).trim();
+  if (!q) return true;
+  if (/^\d+$/.test(q)) {                         // só número: nº da comanda ou pedaço do CPF
+    if (String(c.numero) === q) return true;
+    return q.length >= 3 && String(c.cpf || '').replace(/\D/g, '').includes(q);
+  }
+  if (/^\d+,\d{1,2}$/.test(q)) return n2(totalComanda(c)).includes(q);   // valor, ex.: 54,17
+  const hay = norm([c.numero, ...c.itens.map(i => i.nome), ...c.pagamentos.map(p => formaNome(p.forma)), c.cpf, STATUS_NOME[c.status], ...(c.log || []).map(l => l.motivo || '')].join(' '));
+  return q.split(/\s+/).every(w => hay.includes(w));
+}
+function resultados() {
+  const desdeT = ui.fPeriodo === 'hoje' ? inicioDoDia() : ui.fPeriodo === 'ontem' ? inicioDoDia(1) : ui.fPeriodo === '7' ? inicioDoDia(6) : 0;
+  const ateT = ui.fPeriodo === 'ontem' ? inicioDoDia() : Infinity;
+  return S.comandas
+    .filter(c => ui.fStatus === 'todas' || c.status === ui.fStatus)
+    .filter(c => { const t = quandoComanda(c); return t >= desdeT && t < ateT; })
+    .filter(c => casa(c, ui.q))
+    .sort((a, b) => ((b.status === 'aberta') - (a.status === 'aberta')) || (quandoComanda(b) - quandoComanda(a)));
+}
+function marca(txt) {
+  const q = norm(ui.q).trim();
+  if (!q || /^\d/.test(q)) return esc(txt);
+  const words = q.split(/\s+/).filter(Boolean);
+  const n = norm(txt); let out = '', i = 0;
+  while (i < txt.length) {
+    const w = words.find(w => n.startsWith(w, i));
+    if (w) { out += `<mark>${esc(txt.slice(i, i + w.length))}</mark>`; i += w.length; } else { out += esc(txt[i]); i++; }
+  }
+  return out;
+}
+function viewPesquisar() {
+  const seg = (key, opts) => `<div class="seg" role="group">${opts.map(([v, t]) => `<button data-${key}="${v}" aria-pressed="${ui[key] === v}">${t}</button>`).join('')}</div>`;
+  $('#app').innerHTML = `
+    <div class="search-hero">
+      <h1 class="title">Pesquisar comandas</h1>
+      <form class="search-box" id="sf">
+        ${svg('busca')}
+        <input id="q" value="${esc(ui.q)}" placeholder="Nº da comanda, item, forma de pagamento, CPF ou valor (54,17)" autocomplete="off" aria-label="Pesquisar">
+        ${ui.q ? `<button class="btn flat" type="button" id="limpa">Limpar</button>` : ''}
+      </form>
+      <div class="filters">
+        ${seg('fStatus', [['todas', 'Todas'], ['aberta', 'Abertas'], ['fechada', 'Pagas'], ['cancelada', 'Canceladas']])}
+        ${seg('fPeriodo', [['hoje', 'Hoje'], ['ontem', 'Ontem'], ['7', '7 dias'], ['tudo', 'Tudo']])}
+      </div>
+    </div>
+    <div id="res"></div>`;
+  const q = $('#q');
+  q.oninput = () => { ui.q = q.value; drawRes(); };
+  $('#sf').onsubmit = e => { e.preventDefault(); const r = resultados(); if (r.length === 1) abrirDaBusca(r[0].id); };
+  $('#limpa') && ($('#limpa').onclick = () => { ui.q = ''; viewPesquisar(); $('#q').focus(); });
+  document.querySelectorAll('[data-fStatus],[data-fstatus]').forEach(b => b.onclick = () => { ui.fStatus = b.dataset.fstatus; viewPesquisar(); });
+  document.querySelectorAll('[data-fPeriodo],[data-fperiodo]').forEach(b => b.onclick = () => { ui.fPeriodo = b.dataset.fperiodo; viewPesquisar(); });
+  drawRes();
+  q.focus(); q.setSelectionRange(q.value.length, q.value.length);
+}
+function drawRes() {
+  const r = resultados();
+  const soma = r.filter(c => c.status === 'fechada').reduce((s, c) => s + totalComanda(c), 0);
+  $('#res').innerHTML = `
+    <div class="res-head"><span class="h3">${r.length} ${r.length === 1 ? 'comanda' : 'comandas'}</span>
+      <span class="muted num">${soma ? `${brl(soma)} em comandas pagas` : ''}${r.length === 1 ? ' · aperte Enter para abrir' : ''}</span></div>
+    ${r.length ? `<div class="res">${r.map(c => {
+      const resumo = c.itens.slice(0, 3).map(i => marca(i.tipo === 'kg' ? `Prato ${kgTxt(i.gramas)} kg` : (i.qtd > 1 ? i.qtd + '× ' : '') + i.nome)).join(' · ') + (c.itens.length > 3 ? ` · +${c.itens.length - 3}` : '');
+      const pg = c.pagamentos.map(p => marca(formaNome(p.forma))).join(' + ');
+      return `<button class="rcard" data-open="${c.id}">
+        <div class="rtop"><span class="rn">${c.numero}</span><div><div class="rdate">${quandoTxt(quandoComanda(c))}</div><div class="rtot num">${brl(totalComanda(c))}</div></div>${stampDe(c) || `<span class="stamp warn">ABERTA</span>`}</div>
+        <div class="rbody"><span>${resumo || '<span class="muted">sem itens</span>'}</span>
+          ${pg ? `<span class="muted">Pago em ${pg}</span>` : ''}
+          ${c.cpf ? `<span class="muted">CPF ${esc(c.cpf)}</span>` : ''}
+          ${c.status === 'cancelada' && c.log?.length ? `<span class="muted">Motivo: ${marca(c.log[c.log.length - 1].motivo || '')}</span>` : ''}</div>
+      </button>`;
+    }).join('')}</div>`
+    : `<div class="empty">Nenhuma comanda encontrada${ui.q ? ` para “${esc(ui.q)}”` : ''}.<br>Tente outro período ou status.</div>`}`;
+  document.querySelectorAll('[data-open]').forEach(b => b.onclick = () => abrirDaBusca(b.dataset.open));
+}
+function abrirDaBusca(id) {
+  const c = S.comandas.find(x => x.id === id);
+  ui.sel = id; ui.lista = c.status === 'aberta' ? 'abertas' : 'fechadas'; go('comandas');
+  if (window.innerWidth <= 980) $('.detail').scrollIntoView({ block: 'start' });
+}
+
+/* =========================================================
+   CAIXA
+   ========================================================= */
+function resumoCaixa() {
+  const desdeT = S.caixa.abertoEm || 0;
+  const vendas = S.comandas.filter(c => c.status === 'fechada' && c.fechadaEm >= desdeT);
+  const porForma = Object.fromEntries(FORMAS.map(f => [f.id, 0]));
+  let troco = 0;
+  vendas.forEach(c => { c.pagamentos.forEach(p => porForma[p.forma] += p.valorCents); troco += c.trocoCents || 0; });
+  porForma.dinheiro -= troco;
+  const sup = S.caixa.movimentos.filter(m => m.tipo === 'suprimento').reduce((s, m) => s + m.valorCents, 0);
+  const san = S.caixa.movimentos.filter(m => m.tipo === 'sangria').reduce((s, m) => s + m.valorCents, 0);
+  const totalVendas = vendas.reduce((s, c) => s + totalComanda(c), 0);
+  const esperado = { ...porForma, dinheiro: S.caixa.fundoCents + porForma.dinheiro + sup - san };
+  return { vendas, porForma, sup, san, totalVendas, esperado };
+}
+function viewCaixa() {
+  if (!S.caixa.aberto) {
+    $('#app').innerHTML = `
+      <div class="grid2">
+        <form class="panel pad sect" id="abrirf" style="border-color:var(--ink);box-shadow:0 4px 0 var(--ink)">
+          <h1 class="title">Abrir o caixa</h1>
+          <p class="muted" style="margin:0">Comece o dia aqui. Conte o dinheiro que está na gaveta para o troco.</p>
+          <div class="field"><span class="label">Operador(a)</span><div class="input big" style="background:var(--soft)">${esc(S.usuario.nome)}</div></div>
+          <div class="field"><label class="label" for="fundo">Fundo de troco (dinheiro na gaveta)</label><input class="input big num" id="fundo" inputmode="decimal" value="200,00" autofocus></div>
+          <p class="err" id="aerr" hidden></p>
+          <button class="btn primary huge" type="submit">Abrir caixa</button>
+        </form>
+        ${historicoFechamentos()}
+      </div>`;
+    $('#abrirf').onsubmit = async e => {
+      e.preventDefault();
+      const f = parseMoney($('#fundo').value);
+      if (!(f >= 0)) { $('#aerr').textContent = 'Digite o fundo de troco, ex.: 200,00'; $('#aerr').hidden = false; return; }
+      try { await api('POST', '/api/caixa/abrir', { fundoCents: f }); render(); toast('Caixa aberto'); }
+      catch (x) { $('#aerr').textContent = x.message; $('#aerr').hidden = false; }
+    };
+    return;
+  }
+  const R = resumoCaixa();
+  const ab = abertas();
+  if (ui.cx && !ab.some(c => c.id === ui.cx)) ui.cx = null;
+  const sel = ab.find(c => c.id === ui.cx);
+  $('#app').innerHTML = `
+    <div class="stats" style="margin-bottom:18px">
+      <div class="stat"><span class="label">Aberto por</span><div class="v">${esc(S.caixa.operador)}</div><span class="muted">às ${hora(S.caixa.abertoEm)}</span></div>
+      <div class="stat"><span class="label">Vendas no caixa</span><div class="v num">${brl(R.totalVendas)}</div><span class="muted">${R.vendas.length} comandas pagas</span></div>
+      <div class="stat"><span class="label">Dinheiro na gaveta</span><div class="v num">${brl(R.esperado.dinheiro)}</div><span class="muted">fundo + dinheiro − sangrias</span></div>
+      <div class="stat"><span class="label">Comandas em aberto</span><div class="v num">${ab.length}</div><span class="muted">${brl(ab.reduce((s, c) => s + totalComanda(c), 0))} a receber</span></div>
+    </div>
+    <div class="cxg">
+      <section class="panel pad sect" style="border-color:var(--ink);box-shadow:0 4px 0 var(--ink)">
+        <h2 class="title">Receber comanda</h2>
+        <form class="newbar" id="rf">
+          <input class="input" id="rnum" inputmode="numeric" placeholder="Nº da comanda" autocomplete="off" aria-label="Número da comanda para receber">
+          <button class="btn primary" type="submit">Buscar</button>
+        </form>
+        ${ab.length ? `<div><span class="label">Em aberto · toque para ver a conta</span><div class="chips" style="margin-top:8px">${ab.map(c => `<button class="chip" data-cx="${c.id}" aria-pressed="${c.id === ui.cx}"><b>${c.numero}</b><span class="num">${brl(totalComanda(c))}</span></button>`).join('')}</div></div>`
+          : '<p class="muted" style="margin:0">Nenhuma comanda em aberto.</p>'}
+        ${sel ? rboxHtml(sel) : `<div class="empty">Digite o número da comanda ou toque nela acima para ver a conta e receber.</div>`}
+      </section>
+      <div class="cxside">
+      <section class="panel pad sect">
+        <h3 class="h3">Recebido por forma de pagamento</h3>
+        <div class="tbl-wrap"><table class="num">
+          <thead><tr><th>Forma</th><th class="r">Valor</th></tr></thead>
+          <tbody>${FORMAS.map(f => `<tr><td>${f.nome}${f.id === 'dinheiro' ? ' <span class="muted">(já sem troco)</span>' : ''}</td><td class="r">${brl(R.porForma[f.id])}</td></tr>`).join('')}</tbody>
+          <tfoot><tr><td>Total</td><td class="r">${brl(R.totalVendas)}</td></tr></tfoot>
+        </table></div>
+        <button class="btn primary big" id="fechar">Fechar caixa</button>
+      </section>
+      <section class="panel pad sect">
+        <h3 class="h3">Sangria e suprimento</h3>
+        <div class="actions"><button class="btn grow" id="sang">Sangria (retirar)</button><button class="btn grow" id="supr">Suprimento (colocar)</button></div>
+        <div class="tbl-wrap"><table class="num">
+          <thead><tr><th>Hora</th><th>Tipo</th><th>Motivo</th><th class="r">Valor</th></tr></thead>
+          <tbody>
+            <tr><td>${hora(S.caixa.abertoEm)}</td><td>Fundo de troco</td><td class="muted">abertura</td><td class="r">${brl(S.caixa.fundoCents)}</td></tr>
+            ${S.caixa.movimentos.map(m => `<tr><td>${hora(m.em)}</td><td>${m.tipo === 'sangria' ? 'Sangria' : 'Suprimento'}</td><td>${esc(m.motivo)}</td><td class="r" style="color:${m.tipo === 'sangria' ? 'var(--bad)' : 'var(--ok)'}">${m.tipo === 'sangria' ? '−' : '+'}${brl(m.valorCents)}</td></tr>`).join('')}
+          </tbody>
+        </table></div>
+      </section>
+      ${historicoFechamentos()}
+      </div>
+    </div>`;
+  $('#rf').onsubmit = e => {
+    e.preventDefault();
+    const n = parseInt($('#rnum').value.replace(/\D/g, ''), 10);
+    const c = ab.find(x => x.numero === n);
+    if (!c) { toast(n > 0 ? `A comanda ${n} não está em aberto` : 'Digite o número da comanda'); $('#rnum').select(); return; }
+    ui.cx = c.id; viewCaixa();
+  };
+  document.querySelectorAll('[data-cx]').forEach(b => b.onclick = () => { ui.cx = b.dataset.cx; viewCaixa(); });
+  if (sel) {
+    $('#rpay').onclick = () => abrirPagamento(sel);
+    $('#rconf').onclick = () => verCupom(cupomComanda(sel, 'conf'), `Conferência · comanda ${sel.numero}`);
+    $('#redit').onclick = () => { ui.sel = sel.id; ui.lista = 'abertas'; go('comandas'); };
+    $('#rpay').focus();
+  } else $('#rnum').focus();
+  $('#sang').onclick = () => movimento('sangria');
+  $('#supr').onclick = () => movimento('suprimento');
+  $('#fechar').onclick = fecharCaixa;
+}
+function rboxHtml(c) {
+  return `<div class="rbox">
+    <div class="rbox-head"><span class="h3">Comanda ${c.numero}</span><span class="muted">aberta há ${desde(c.abertaEm)}</span></div>
+    <div class="rbox-body">${c.itens.map(i => `<div class="line num"><span class="nm">${esc(i.tipo === 'kg' ? 'Prato ' + kgTxt(i.gramas) + ' kg' : (i.qtd > 1 ? i.qtd + '× ' : '') + i.nome)}</span><span class="dots"></span><span class="tot">${brl(i.totalCents)}</span></div>`).join('') || '<span class="muted">Comanda vazia.</span>'}</div>
+    <div class="rbox-foot">
+      <div class="total"><span class="h3">Total</span><span class="v num" style="font-size:44px">${brl(totalComanda(c))}</span></div>
+      <button class="btn ok huge" id="rpay" ${!c.itens.length ? 'disabled' : ''}>Receber <span class="kbd">F8</span></button>
+      <div class="actions"><button class="btn grow" id="rconf">Imprimir conferência</button><button class="btn grow" id="redit">Editar comanda</button></div>
+    </div>
+  </div>`;
+}
+function movimento(tipo) {
+  const nome = tipo === 'sangria' ? 'Sangria' : 'Suprimento';
+  openModal(`
+    <div class="m-head"><h3>${nome}</h3>${xBtn}</div>
+    <form class="m-body" id="mvf">
+      <p class="muted" style="margin:0">${tipo === 'sangria' ? 'Dinheiro retirado da gaveta (ex.: levar ao cofre, pagar fornecedor).' : 'Dinheiro colocado na gaveta (ex.: mais troco).'}</p>
+      <div class="field"><label class="label" for="mv">Valor</label><input class="input big num" id="mv" inputmode="decimal" autofocus autocomplete="off"></div>
+      <div class="field"><label class="label" for="mm">Motivo</label><input class="input" id="mm" placeholder="${tipo === 'sangria' ? 'Ex.: depósito no cofre' : 'Ex.: troco em moedas'}"></div>
+      <p class="err" id="merr" hidden></p>
+    </form>
+    <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" type="submit" form="mvf">Registrar ${nome.toLowerCase()}</button></div>`, r => {
+    $('#mvf', r).onsubmit = async e => {
+      e.preventDefault();
+      const v = parseMoney($('#mv', r).value), mot = $('#mm', r).value.trim();
+      const er = t => { $('#merr', r).textContent = t; $('#merr', r).hidden = false; };
+      if (!(v > 0)) return er('Digite o valor, ex.: 300,00');
+      if (!mot) return er('Escreva o motivo.');
+      if (tipo === 'sangria' && v > resumoCaixa().esperado.dinheiro) return er('A sangria é maior que o dinheiro que deveria estar na gaveta.');
+      try { await api('POST', '/api/caixa/movimentos', { tipo, valorCents: v, motivo: mot }); } catch (x) { return er(x.message); }
+      const m = { em: Date.now() };
+      closeModal(); render();
+      verCupom([...cabecalho(), centro(nome.toUpperCase()), lr('Data', dataHora(m.em)), lr('Operador', S.caixa.operador), lr('Valor', brl(v)), 'Motivo: ' + mot, '', '', centro('______________________'), centro('Assinatura')].join('\n'), `${nome} registrada`);
+    };
+  });
+}
+function fecharCaixa() {
+  const ab = abertas();
+  const go2 = () => {
+    const R = resumoCaixa();
+    const linhas = FORMAS.filter(f => R.esperado[f.id] || f.id === 'dinheiro');
+    openModal(`
+      <div class="m-head"><h3>Fechar caixa · conferência</h3>${xBtn}</div>
+      <div class="m-body">
+        <p class="muted" style="margin:0">Conte o dinheiro da gaveta e some os comprovantes da maquininha. Digite o que contou; o sistema mostra se sobrou ou faltou.</p>
+        <div class="tbl-wrap"><table class="num">
+          <thead><tr><th>Forma</th><th class="r">Sistema</th><th class="r">Contado</th><th class="r">Diferença</th></tr></thead>
+          <tbody>${linhas.map(f => `<tr><td>${f.nome}</td><td class="r">${brl(R.esperado[f.id])}</td>
+            <td class="r"><input class="input num" style="width:120px;text-align:right;padding:6px 8px" data-ct="${f.id}" inputmode="decimal" value="${n2(R.esperado[f.id])}" aria-label="Contado em ${f.nome}"></td>
+            <td class="r" data-df="${f.id}">${brl(0)}</td></tr>`).join('')}</tbody>
+          <tfoot><tr><td>Total</td><td class="r">${brl(linhas.reduce((s, f) => s + R.esperado[f.id], 0))}</td><td class="r" id="ctTot"></td><td class="r" id="dfTot"></td></tr></tfoot>
+        </table></div>
+        <p class="note" style="margin:0">O dinheiro do sistema já inclui o fundo de troco (${brl(S.caixa.fundoCents)}), suprimentos (${brl(R.sup)}) e desconta sangrias (${brl(R.san)}).</p>
+      </div>
+      <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" id="cfin">Fechar caixa e imprimir</button></div>`, r => {
+      const lerContado = () => Object.fromEntries(linhas.map(f => { const v = parseMoney($(`[data-ct="${f.id}"]`, r).value); return [f.id, isNaN(v) ? 0 : v]; }));
+      const upd = () => {
+        const ct = lerContado(); let td = 0, tc = 0;
+        linhas.forEach(f => {
+          const d = ct[f.id] - R.esperado[f.id]; td += d; tc += ct[f.id];
+          const el = $(`[data-df="${f.id}"]`, r);
+          el.textContent = d === 0 ? 'ok' : (d > 0 ? 'sobra ' : 'falta ') + brl(Math.abs(d));
+          el.className = 'r ' + (d === 0 ? 'diff-ok' : 'diff-bad');
+        });
+        $('#ctTot', r).textContent = brl(tc);
+        $('#dfTot', r).textContent = td === 0 ? 'ok' : (td > 0 ? 'sobra ' : 'falta ') + brl(Math.abs(td));
+        $('#dfTot', r).className = 'r ' + (td === 0 ? 'diff-ok' : 'diff-bad');
+      };
+      r.querySelectorAll('[data-ct]').forEach(i => i.oninput = upd); upd();
+      $('#cfin', r).onclick = async () => {
+        const ct = lerContado();
+        let fch;
+        try { fch = (await api('POST', '/api/caixa/fechar', { contado: ct })).fechamento; } catch (x) { toast(x.message); return; }
+        closeModal(); render();
+        const L = [...cabecalho(), centro('FECHAMENTO DE CAIXA'), lr('Operador', fch.operador), lr('Abertura', dataHora(fch.abertoEm)), lr('Fechamento', dataHora(fch.fechadoEm)), lin(),
+          lr('Comandas pagas', fch.comandas), lr('Total de vendas', brl(fch.totalVendasCents)), lr('Fundo de troco', brl(fch.fundoCents)), lr('Suprimentos', brl(fch.suprimentosCents)), lr('Sangrias', brl(fch.sangriasCents)), lin(),
+          lr('FORMA', 'SISTEMA / CONTADO'), ...linhas.map(f => lr(f.nome, `${n2(fch.esperado[f.id])} / ${n2(ct[f.id])}`)), lin(),
+          lr('DIFERENÇA', (fch.diferencaCents > 0 ? '+' : '') + brl(fch.diferencaCents)), '', '', centro('______________________'), centro('Assinatura do operador')];
+        verCupom(L.join('\n'), 'Caixa fechado');
+      };
+    }, true);
+  };
+  if (ab.length) confirmar('Ainda há comandas abertas', `Existem <b>${ab.length}</b> comandas abertas (${ab.map(c => c.numero).join(', ')}). Elas continuam abertas para o próximo caixa. Quer fechar mesmo assim?`, 'Continuar fechamento', go2);
+  else go2();
+}
+function historicoFechamentos() {
+  return `<div class="panel pad sect">
+    <h3 class="h3">Fechamentos anteriores</h3>
+    ${S.fechamentos.length ? `<div class="tbl-wrap"><table class="num">
+      <thead><tr><th>Fechado em</th><th>Operador</th><th class="r">Vendas</th><th class="r">Diferença</th></tr></thead>
+      <tbody>${S.fechamentos.map(f => `<tr><td>${dataHora(f.fechadoEm)}</td><td>${esc(f.operador)}</td><td class="r">${brl(f.totalVendasCents)}</td><td class="r ${f.diferencaCents ? 'diff-bad' : 'diff-ok'}">${f.diferencaCents ? (f.diferencaCents > 0 ? '+' : '') + brl(f.diferencaCents) : 'ok'}</td></tr>`).join('')}</tbody>
+    </table></div>` : `<p class="muted" style="margin:0">Nenhum fechamento ainda. Eles aparecem aqui com a sobra ou falta de cada dia.</p>`}
+  </div>`;
+}
+
+/* =========================================================
+   RELATÓRIO DO DIA
+   ========================================================= */
+function viewRelatorio() {
+  const hoje = S.comandas.filter(c => c.status === 'fechada' && c.fechadaEm >= inicioDoDia());
+  const tot = hoje.reduce((s, c) => s + totalComanda(c), 0);
+  const gramas = hoje.reduce((s, c) => s + c.itens.filter(i => i.tipo === 'kg').reduce((a, i) => a + i.gramas, 0), 0);
+  const fat = Object.fromEntries(FORMAS.map(f => [f.id, 0]));
+  hoje.forEach(c => { c.pagamentos.forEach(p => fat[p.forma] += p.valorCents); fat.dinheiro -= c.trocoCents || 0; });
+  const prods = {};
+  hoje.forEach(c => c.itens.forEach(i => { const k = i.tipo === 'kg' ? 'Refeição por quilo' : i.nome; prods[k] = prods[k] || { q: 0, v: 0, kg: i.tipo === 'kg' }; prods[k].q += i.tipo === 'kg' ? 1 : i.qtd; prods[k].v += i.totalCents; }));
+  const top = Object.entries(prods).sort((a, b) => b[1].v - a[1].v);
+  const maxF = Math.max(1, ...Object.values(fat));
+  const canc = S.comandas.filter(c => c.status === 'cancelada' && c.canceladaEm >= inicioDoDia());
+  const removidos = S.comandas.flatMap(c => (c.log || []).filter(l => l.em >= inicioDoDia()).map(l => ({ ...l, numero: c.numero })));
+  $('#app').innerHTML = `
+    <div style="margin-bottom:16px"><span class="label">Relatório</span><h1 class="title">Hoje, ${new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</h1></div>
+    <div class="stats" style="margin-bottom:18px">
+      <div class="stat"><span class="label">Faturamento</span><div class="v num">${brl(tot)}</div></div>
+      <div class="stat"><span class="label">Comandas pagas</span><div class="v num">${hoje.length}</div></div>
+      <div class="stat"><span class="label">Ticket médio</span><div class="v num">${brl(hoje.length ? Math.round(tot / hoje.length) : 0)}</div></div>
+      <div class="stat"><span class="label">Comida vendida</span><div class="v num">${kgTxt(gramas)} kg</div></div>
+    </div>
+    <div class="grid2">
+      <div class="panel pad sect"><h3 class="h3">Por forma de pagamento</h3>
+        ${FORMAS.map(f => `<div style="display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) 100px;gap:10px;align-items:center" class="num"><span>${f.nome}</span><div class="bar"><i style="width:${Math.round(100 * Math.max(0, fat[f.id]) / maxF)}%"></i></div><b style="text-align:right">${brl(fat[f.id])}</b></div>`).join('')}
+      </div>
+      <div class="panel pad sect"><h3 class="h3">O que mais vendeu</h3>
+        ${top.length ? `<div class="tbl-wrap"><table class="num"><thead><tr><th>Item</th><th class="r">Qtd</th><th class="r">Valor</th></tr></thead>
+        <tbody>${top.map(([n, d]) => `<tr><td>${esc(n)}</td><td class="r">${d.q}${d.kg ? ' pratos' : ''}</td><td class="r">${brl(d.v)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">Sem vendas hoje ainda.</p>'}
+      </div>
+      <div class="panel pad sect"><h3 class="h3">Cancelamentos e alterações</h3>
+        ${removidos.length ? `<div class="tbl-wrap"><table><thead><tr><th>Hora</th><th>Comanda</th><th>O quê</th></tr></thead><tbody>
+          ${removidos.sort((a, b) => b.em - a.em).map(l => `<tr><td class="num">${hora(l.em)}</td><td class="num">${l.numero}</td><td>${esc(l.acao)}${l.item ? ': ' + esc(l.item) + ' (' + brl(l.valorCents) + ')' : ''}${l.motivo ? ' · ' + esc(l.motivo) : ''}</td></tr>`).join('')}</tbody></table></div>`
+          : '<p class="muted" style="margin:0">Nada cancelado ou removido hoje.</p>'}
+        ${canc.length ? `<p class="muted" style="margin:0">${canc.length} comanda(s) cancelada(s) hoje.</p>` : ''}
+      </div>
+      <div class="panel pad sect"><h3 class="h3">Notas fiscais para o contador</h3>
+        <p style="margin:0">Na <b>Fase 3</b> esta tela gera, para qualquer período, o arquivo ZIP com todos os XMLs das NFC-e (autorizadas, canceladas e inutilizadas), mais um resumo em PDF e uma planilha para o contador.</p>
+        <button class="btn" disabled>Exportar XMLs do mês (Fase 3)</button>
+      </div>
+    </div>`;
+}
+
+/* =========================================================
+   BALANÇA
+   ========================================================= */
+function viewBalanca() {
+  const pes = S.comandas.flatMap(c => c.itens.filter(i => i.tipo === 'kg').map(i => ({ i, c })))
+    .sort((a, b) => (b.i.em || 0) - (a.i.em || 0)).slice(0, 12);
+  $('#app').innerHTML = `
+  <div class="bal">
+    <section class="panel bal-main">
+      <div class="bal-head"><h1>Balança</h1><span class="kg">Preço do quilo <b class="num">${brl(S.config.precoKgCents)}</b></span></div>
+      <form class="bal-form" id="bf" autocomplete="off">
+        <div class="field"><label class="label" for="bcmd">1 · Comanda nº</label><input class="bal-in num" id="bcmd" inputmode="numeric" placeholder="00" value="${esc(ui.bcmd)}"></div>
+        <div class="field"><label class="label" for="bpeso">2 · Peso do prato</label><div class="g-in big"><input id="bpeso" class="num" inputmode="numeric" placeholder="000"><span>g</span></div></div>
+        <div class="lcd big num" aria-live="polite">
+          <div><small>PESO kg</small><b id="bKg">0,000</b></div>
+          <div><small>R$ / kg</small><b>${n2(S.config.precoKgCents)}</b></div>
+          <div class="tot"><small>TOTAL R$</small><b id="bTot">0,00</b></div>
+        </div>
+        <div class="bal-info" id="binfo"></div>
+        <button class="btn primary huge full" type="submit">Lançar na comanda</button>
+      </form>
+      <p class="steps">Digite a comanda e aperte <span class="kbd">Enter</span>, digite o peso e aperte <span class="kbd">Enter</span>. O prato entra na comanda e a tela fica pronta para o próximo cliente. Se a comanda ainda não existe, ela é aberta na hora.</p>
+    </section>
+    <section class="panel pad sect">
+      <h3 class="h3">Últimas pesagens</h3>
+      ${pes.length ? `<ul class="pes">${pes.map(({ i, c }) => `<li class="${c.status !== 'aberta' ? 'closed' : ''} ${ui.flash === i.id ? 'new' : ''}">
+          <span class="pn">${c.numero}</span>
+          <div><div class="num" style="font-weight:800">${kgTxt(i.gramas)} kg</div><div class="muted num" style="font-size:13px">${i.em ? quandoTxt(i.em) : ''}${c.status !== 'aberta' ? ' · comanda ' + STATUS_NOME[c.status] : ''}</div></div>
+          <b class="num">${brl(i.totalCents)}</b>
+          ${c.status === 'aberta' ? `<button class="btn flat" data-undo="${i.id}" data-c="${c.id}">Desfazer</button>` : '<span></span>'}
+        </li>`).join('')}</ul>` : '<p class="muted" style="margin:0">Nenhum prato pesado ainda.</p>'}
+    </section>
+  </div>`;
+  ui.flash = null;
+  const bcmd = $('#bcmd'), bpeso = $('#bpeso');
+  const num = el => parseInt(el.value.replace(/\D/g, ''), 10);
+  const info = () => {
+    const n = num(bcmd), g = num(bpeso);
+    $('#bKg').textContent = g > 0 ? kgTxt(g) : '0,000';
+    $('#bTot').textContent = g > 0 ? n2(precoPrato(g, S.config.precoKgCents)) : '0,00';
+    let h;
+    if (!(n > 0)) h = '<span class="muted">Digite o número do cartão da comanda.</span>';
+    else {
+      const c = abertas().find(x => x.numero === n);
+      h = c ? `<span class="tag ok">Comanda ${n} aberta</span><span>${c.itens.length} ${c.itens.length === 1 ? 'item' : 'itens'} · <b class="num">${brl(totalComanda(c))}</b> até agora${g > 0 ? ` · com este prato fica <b class="num">${brl(totalComanda(c) + precoPrato(g, S.config.precoKgCents))}</b>` : ''}</span>`
+            : `<span class="tag new">Comanda nova</span><span>A comanda ${n} será aberta quando você lançar o prato.</span>`;
+    }
+    $('#binfo').innerHTML = h;
+  };
+  bcmd.oninput = () => { ui.bcmd = bcmd.value; info(); };
+  bpeso.oninput = info;
+  $('#bf').onsubmit = e => {
+    e.preventDefault();
+    const n = num(bcmd), g = num(bpeso);
+    if (!(n > 0)) { toast('Digite o número da comanda'); bcmd.focus(); return; }
+    if (document.activeElement === bcmd) { bpeso.focus(); return; }
+    if (!(g > 0)) { toast('Digite o peso em gramas, ex.: 507'); bpeso.focus(); return; }
+    if (g > 5000) { toast('Peso acima de 5 kg. Confira se digitou em gramas.'); bpeso.select(); return; }
+    acao(async () => {
+      const d = await api('POST', '/api/balanca', { numero: n, gramas: g });
+      ui.flash = d.item.id; ui.bcmd = '';
+      viewBalanca(); renderTop();
+      toast(`${d.nova ? 'Comanda ' + n + ' aberta · ' : 'Comanda ' + n + ': '}prato ${kgTxt(g)} kg = ${brl(d.item.totalCents)}`);
+    });
+  };
+  document.querySelectorAll('[data-undo]').forEach(b => b.onclick = () => {
+    const c = S.comandas.find(x => x.id === b.dataset.c), i = c && c.itens.find(x => x.id === b.dataset.undo);
+    if (!i) return;
+    confirmar('Desfazer pesagem', `Tirar o prato de <b>${kgTxt(i.gramas)} kg (${brl(i.totalCents)})</b> da comanda ${c.numero}? Fica registrado no histórico.`, 'Tirar da comanda', () => {
+      acao(async () => { await api('DELETE', `/api/itens/${i.id}`, { acao: 'pesagem desfeita' }); viewBalanca(); toast('Pesagem desfeita'); });
+    }, true);
+  });
+  info();
+  (ui.bcmd ? bpeso : bcmd).focus();
+}
+
+/* =========================================================
+   CUPOM: cabeçalho com os dados da empresa
+   ========================================================= */
+function quebra(s) {
+  const C = colunas(), out = []; let cur = '';
+  String(s).split(/\s+/).forEach(w => { if ((cur + ' ' + w).trim().length > C) { out.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); });
+  if (cur) out.push(cur);
+  return out;
+}
+function cabecalho(cfg = S.config) {
+  const L = [centro((cfg.empresa || '').toUpperCase())];
+  if (cfg.razao) quebra(cfg.razao).forEach(l => L.push(centro(l)));
+  L.push(centro('CNPJ ' + (cfg.cnpj || '__.___.___/____-__') + (cfg.ie ? '  IE ' + cfg.ie : '')));
+  const end = [cfg.endereco, cfg.bairro].filter(Boolean).join(', ');
+  if (end) quebra(end).forEach(l => L.push(centro(l)));
+  const cid = [[cfg.cidade, cfg.uf].filter(Boolean).join('/'), cfg.cep ? 'CEP ' + cfg.cep : ''].filter(Boolean).join(' · ');
+  if (cid) L.push(centro(cid));
+  if (cfg.telefone) L.push(centro('Tel. ' + cfg.telefone));
+  L.push(lin());
+  return L;
+}
+
+/* =========================================================
+   CONFIGURAÇÕES
+   ========================================================= */
+const CFG = [['produtos', 'Produtos'], ['quilo', 'Preço do quilo'], ['empresa', 'Empresa'], ['impressora', 'Impressora'], ['fiscal', 'Nota fiscal'], ['usuarios', 'Usuários'], ['conta', 'Minha senha'], ['backup', 'Backup']];
+const cfgVisiveis = () => ehGerente() ? CFG : CFG.filter(([id]) => id === 'conta');
+const CHECK = [
+  ['cert', 'Certificado digital A1 (e-CNPJ)', 'Compra numa certificadora (Serasa, Certisign, Valid…). Uns R$ 150 a 250 por ano. É um arquivo .pfx com senha que fica no computador do caixa.'],
+  ['ie', 'Inscrição estadual ativa', 'O restaurante precisa de inscrição estadual para emitir NFC-e. O contador confirma.'],
+  ['cred', 'Credenciamento para NFC-e na SEFAZ', 'O contador faz pelo site da SEFAZ do estado. É o que libera o restaurante a emitir a nota do consumidor.'],
+  ['csc', 'Código CSC gerado na SEFAZ', 'Um código de segurança (token) que vai no QR Code da nota. É gerado no mesmo site da SEFAZ.'],
+  ['tab', 'Tabela fiscal dos produtos', 'O contador passa NCM, CFOP e CSOSN/CST de cada item. Bebidas costumam ter substituição tributária (CEST). Os campos já existem em cada produto.'],
+  ['api', 'Contratar o serviço emissor de NFC-e', 'Uma empresa que conversa com a SEFAZ pelo sistema (ex.: Focus NFe, Nuvem Fiscal, PlugNotas). Uns R$ 50 a 150 por mês.'],
+];
+const diasCert = () => S.fiscal && S.fiscal.certificado ? Math.ceil((S.fiscal.certificado.validoAte - Date.now()) / 864e5) : null;
+const dataCurta = t => new Date(t).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const fiscalFeitos = () => CHECK.filter(([k]) => S.fiscal.checklist[k]).length;
+
+function viewConfig() {
+  if (!cfgVisiveis().some(([id]) => id === ui.cfg)) ui.cfg = cfgVisiveis()[0][0];
+  const sub = { produtos: S.produtos.length + ' itens', quilo: brl(S.config.precoKgCents), impressora: S.impressora.modelo, fiscal: `${fiscalFeitos()} de ${CHECK.length}` };
+  $('#app').innerHTML = `<div class="cfg">
+    <nav class="cfg-nav" aria-label="Configurações">${cfgVisiveis().map(([id, n]) => `<button data-cfg="${id}" aria-current="${ui.cfg === id}">${n}${sub[id] ? `<small class="num">${esc(sub[id])}</small>` : ''}</button>`).join('')}</nav>
+    <div class="cfg-body" id="cfgb"></div></div>`;
+  document.querySelectorAll('[data-cfg]').forEach(b => b.onclick = () => { ui.cfg = b.dataset.cfg; viewConfig(); });
+  ({ produtos: cfgProdutos, quilo: cfgQuilo, empresa: cfgEmpresa, impressora: cfgImpressora, fiscal: cfgFiscal, usuarios: cfgUsuarios, conta: cfgConta, backup: cfgBackup }[ui.cfg] || cfgProdutos)($('#cfgb'));
+}
+
+/* ---------- produtos ---------- */
+function cfgProdutos(el) {
+  el.innerHTML = `
+    <section class="panel pad sect">
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
+        <div style="min-width:0"><h1 class="title">Produtos da casa</h1><p class="muted" style="margin:6px 0 0">Tudo o que aparece nos quadradinhos da comanda. A comida por quilo fica em “Preço do quilo”.</p></div>
+        <button class="btn primary big" id="pnew">+ Novo produto</button>
+      </div>
+      <div class="picker-top" style="margin:0">
+        <div class="cats" role="group" aria-label="Categoria">
+          <button class="cat" data-pcat="todas" aria-pressed="${ui.pcat === 'todas'}">Todos <span class="num">${S.produtos.length}</span></button>
+          ${cats().map(k => `<button class="cat" data-pcat="${k.id}" aria-pressed="${ui.pcat === k.id}"><i style="background:${k.cor}"></i>${esc(k.nome)} <span class="num">${S.produtos.filter(p => p.cat === k.id).length}</span></button>`).join('')}
+        </div>
+        <div class="find">${svg('busca')}<input class="input" id="pq" placeholder="Buscar produto ou código…" value="${esc(ui.pq)}" autocomplete="off" aria-label="Buscar produto"></div>
+      </div>
+      <div id="plist"></div>
+    </section>
+    <section class="panel pad sect">
+      <h3 class="h3">Categorias</h3>
+      <p class="muted" style="margin:0">Cada categoria vira uma aba na hora de lançar na comanda. Toque numa categoria para mudar o nome ou a cor.</p>
+      <div class="chips">${cats().map(k => `<button class="catchip" data-ecat="${k.id}"><i style="background:${k.cor}"></i>${esc(k.nome)} <small class="num">${S.produtos.filter(p => p.cat === k.id).length}</small></button>`).join('')}</div>
+      <form class="row" id="ncat">
+        <div class="field"><label class="label" for="ncn">Nova categoria</label><input class="input" id="ncn" placeholder="Ex.: Cervejas, Sucos, Porções" autocomplete="off"></div>
+        <div class="field" style="flex:0 1 auto;min-width:0"><span class="label">Cor</span><div class="swatches">${PALETA.map((c, k) => `<button type="button" class="swatch" data-sw="${c}" style="background:${c}" aria-pressed="${k === cats().length % PALETA.length}" aria-label="Cor ${k + 1}"></button>`).join('')}</div></div>
+        <button class="btn" type="submit">Adicionar categoria</button>
+      </form>
+    </section>`;
+  const drawList = () => {
+    const q = norm(ui.pq.trim());
+    const lista = S.produtos.filter(p => (ui.pcat === 'todas' || p.cat === ui.pcat) && (!q || norm(p.nome).includes(q) || p.codigo === ui.pq.trim()));
+    const grupos = [...cats(), { id: null, nome: 'Sem categoria', cor: '#8A7663' }];
+    const row = p => `<div class="prow ${p.ativo ? '' : 'off'}">
+        <span class="cod">${esc(p.codigo || '—')}</span>
+        <span class="pn2"><b>${esc(p.nome)}</b>${p.ativo ? '' : ' <span class="tag off">fora da comanda</span>'}</span>
+        <span class="pr2 num">${n2(p.precoCents)}</span>
+        <label class="switch" title="Aparece na comanda"><input type="checkbox" data-pa="${p.id}" ${p.ativo ? 'checked' : ''} aria-label="${esc(p.nome)} aparece na comanda"></label>
+        <button class="btn" data-pe="${p.id}">Editar</button>
+      </div>`;
+    $('#plist').innerHTML = lista.length ? grupos.map(k => {
+      const ps = lista.filter(p => k.id ? p.cat === k.id : !cats().some(x => x.id === p.cat));
+      return ps.length ? `<div class="cat-head"><span class="sq" style="background:${k.cor}"></span><h3>${esc(k.nome)}</h3><span class="muted num">${ps.length}</span></div>${ps.map(row).join('')}` : '';
+    }).join('') : !S.produtos.length
+      ? `<div class="empty">Nenhum produto cadastrado ainda.<br>Toque em “Novo produto” ou comece com uma lista de exemplo e ajuste os preços.<br><br><button class="btn" id="pex">Carregar lista de exemplo</button></div>`
+      : `<div class="empty">Nenhum produto encontrado${ui.pq ? ` para “${esc(ui.pq)}”` : ''}.</div>`;
+    $('#pex') && ($('#pex').onclick = () => acao(async () => { await api('POST', '/api/produtos/exemplo', {}); viewConfig(); toast('Lista de exemplo carregada. Confira os preços.'); }));
+    document.querySelectorAll('[data-pa]').forEach(i => i.onchange = () => acao(async () => { const p = S.produtos.find(x => x.id === i.dataset.pa); await api('PATCH', `/api/produtos/${p.id}`, { ativo: i.checked }); drawList(); toast(i.checked ? `${p.nome} volta a aparecer na comanda` : `${p.nome} saiu da comanda`); }));
+    document.querySelectorAll('[data-pe]').forEach(b => b.onclick = () => prodModal(S.produtos.find(x => x.id === b.dataset.pe)));
+  };
+  drawList();
+  $('#pq').oninput = e => { ui.pq = e.target.value; drawList(); };
+  document.querySelectorAll('[data-pcat]').forEach(b => b.onclick = () => { ui.pcat = b.dataset.pcat; viewConfig(); });
+  $('#pnew').onclick = () => prodModal();
+  document.querySelectorAll('[data-ecat]').forEach(b => b.onclick = () => catModal(cats().find(k => k.id === b.dataset.ecat)));
+  let cor = PALETA[cats().length % PALETA.length];
+  document.querySelectorAll('[data-sw]').forEach(b => b.onclick = () => { cor = b.dataset.sw; document.querySelectorAll('[data-sw]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  $('#ncat').onsubmit = e => {
+    e.preventDefault();
+    const nome = $('#ncn').value.trim();
+    if (!nome) { toast('Digite o nome da categoria'); return; }
+    if (cats().some(k => norm(k.nome) === norm(nome))) { toast('Já existe uma categoria com esse nome'); return; }
+    acao(async () => { await api('POST', '/api/categorias', { nome, cor }); viewConfig(); toast(`Categoria ${nome} criada`); });
+  };
+}
+function prodModal(p) {
+  const catPadrao = p ? p.cat : (ui.pcat !== 'todas' ? ui.pcat : cats()[0]?.id);
+  const f = p?.fiscal || {};
+  openModal(`
+    <div class="m-head"><h3>${p ? 'Editar produto' : 'Novo produto'}</h3>${xBtn}</div>
+    <form class="m-body" id="pf" autocomplete="off">
+      <div class="field"><label class="label" for="fn">Nome</label><input class="input big" id="fn" value="${esc(p?.nome || '')}" placeholder="Ex.: Suco de laranja 400ml" autofocus></div>
+      <div class="form-grid">
+        <div class="field"><label class="label" for="fc">Categoria</label><select class="input" id="fc">${cats().map(k => `<option value="${k.id}" ${catPadrao === k.id ? 'selected' : ''}>${esc(k.nome)}</option>`).join('')}</select></div>
+        <div class="field"><label class="label" for="fp">Preço (R$)</label><input class="input num" id="fp" inputmode="decimal" value="${p ? n2(p.precoCents) : ''}" placeholder="0,00"></div>
+        <div class="field"><label class="label" for="fco">Código (opcional)</label><input class="input num" id="fco" value="${esc(p?.codigo || '')}" placeholder="Ex.: 105"></div>
+      </div>
+      <p class="muted" style="margin:-4px 0 0;font-size:14px">Com código, basta digitar o número na busca da comanda para achar o item.</p>
+      <label class="switch"><input type="checkbox" id="fa" ${!p || p.ativo ? 'checked' : ''}> Aparece na comanda</label>
+      <details class="note">
+        <summary>Dados fiscais (preencher com o contador)</summary>
+        <div class="form-grid" style="margin-top:10px">
+          <div class="field"><label class="label" for="fncm">NCM</label><input class="input num" id="fncm" value="${esc(f.ncm || '')}" placeholder="0000.00.00"></div>
+          <div class="field"><label class="label" for="fcfop">CFOP</label><input class="input num" id="fcfop" value="${esc(f.cfop || '')}" placeholder="5102"></div>
+          <div class="field"><label class="label" for="fcest">CEST</label><input class="input num" id="fcest" value="${esc(f.cest || '')}" placeholder="só se tiver ST"></div>
+        </div>
+        <p style="margin:8px 0 0">Necessários para a nota fiscal. Pode deixar em branco por enquanto.</p>
+      </details>
+      <p class="err" id="ferr" hidden></p>
+    </form>
+    <div class="m-foot">
+      ${p ? `<button class="btn danger" id="fdel" type="button" style="margin-right:auto">Excluir</button>` : ''}
+      <button class="btn" data-close>Cancelar</button>
+      ${p ? '' : `<button class="btn" type="submit" form="pf" id="fmore">Salvar e cadastrar outro</button>`}
+      <button class="btn primary" type="submit" form="pf" id="fsave">${p ? 'Salvar' : 'Cadastrar produto'}</button>
+    </div>`, r => {
+    const er = t => { $('#ferr', r).textContent = t; $('#ferr', r).hidden = false; };
+    $('#pf', r).onsubmit = async e => {
+      e.preventDefault();
+      const nome = $('#fn', r).value.trim(), preco = parseMoney($('#fp', r).value), codigo = $('#fco', r).value.trim();
+      if (!nome) return er('Digite o nome do produto.');
+      if (!(preco > 0)) return er('Digite o preço, ex.: 6,00');
+      if (codigo && S.produtos.some(x => x !== p && x.codigo === codigo)) return er(`O código ${codigo} já é de outro produto.`);
+      const dados = { nome, cat: $('#fc', r).value, precoCents: preco, codigo, ativo: $('#fa', r).checked, fiscal: { ncm: $('#fncm', r).value.trim(), cfop: $('#fcfop', r).value.trim(), cest: $('#fcest', r).value.trim() } };
+      try { if (p) await api('PUT', `/api/produtos/${p.id}`, dados); else await api('POST', '/api/produtos', dados); } catch (x) { return er(x.message); }
+      closeModal(); viewConfig();
+      toast(p ? `${nome} salvo` : `${nome} cadastrado`);
+      if (e.submitter && e.submitter.id === 'fmore') { ui.pcat = dados.cat; prodModal(); }
+    };
+    $('#fdel', r) && ($('#fdel', r).onclick = () => confirmar('Excluir produto', `Excluir <b>${esc(p.nome)}</b>? As comandas antigas continuam mostrando o item normalmente.`, 'Excluir', () => {
+      acao(async () => { await api('DELETE', `/api/produtos/${p.id}`, {}); viewConfig(); toast(`${p.nome} excluído`); });
+    }, true));
+  });
+}
+function catModal(k) {
+  let cor = k.cor;
+  const n = S.produtos.filter(p => p.cat === k.id).length;
+  openModal(`
+    <div class="m-head"><h3>Categoria</h3>${xBtn}</div>
+    <form class="m-body" id="cf">
+      <div class="field"><label class="label" for="cn">Nome</label><input class="input big" id="cn" value="${esc(k.nome)}" autofocus></div>
+      <div class="field"><span class="label">Cor</span><div class="swatches">${PALETA.map((c, i) => `<button type="button" class="swatch" data-sw2="${c}" style="background:${c}" aria-pressed="${c === k.cor}" aria-label="Cor ${i + 1}"></button>`).join('')}</div></div>
+      <p class="muted" style="margin:0">${n} ${n === 1 ? 'produto' : 'produtos'} nesta categoria.</p>
+      <p class="err" id="cerr" hidden></p>
+    </form>
+    <div class="m-foot"><button class="btn danger" id="cdel" type="button" style="margin-right:auto">Excluir categoria</button><button class="btn" data-close>Cancelar</button><button class="btn primary" type="submit" form="cf">Salvar</button></div>`, r => {
+    r.querySelectorAll('[data-sw2]').forEach(b => b.onclick = () => { cor = b.dataset.sw2; r.querySelectorAll('[data-sw2]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    $('#cf', r).onsubmit = e => {
+      e.preventDefault(); const nome = $('#cn', r).value.trim();
+      if (!nome) { $('#cerr', r).textContent = 'Digite o nome.'; $('#cerr', r).hidden = false; return; }
+      acao(async () => { try { await api('PUT', `/api/categorias/${k.id}`, { nome, cor }); } catch (x) { $('#cerr', r).textContent = x.message; $('#cerr', r).hidden = false; return; } closeModal(); viewConfig(); toast('Categoria salva'); });
+    };
+    $('#cdel', r).onclick = () => {
+      if (n) { $('#cerr', r).textContent = `Mova ou exclua os ${n} produtos desta categoria antes de excluí-la.`; $('#cerr', r).hidden = false; return; }
+      if (cats().length === 1) { $('#cerr', r).textContent = 'É preciso ter pelo menos uma categoria.'; $('#cerr', r).hidden = false; return; }
+      acao(async () => { await api('DELETE', `/api/categorias/${k.id}`, {}); if (ui.cat === k.id) ui.cat = (cats()[0] || {}).id; if (ui.pcat === k.id) ui.pcat = 'todas'; closeModal(); viewConfig(); toast('Categoria excluída'); });
+    };
+  });
+}
+
+/* ---------- preço do quilo ---------- */
+function cfgQuilo(el) {
+  el.innerHTML = `
+    <form class="panel pad sect" id="kgf">
+      <h1 class="title">Preço do quilo</h1>
+      <div class="row">
+        <div class="field" style="max-width:260px"><label class="label" for="kg">Valor por kg (R$)</label><input class="input big num" id="kg" inputmode="decimal" value="${n2(S.config.precoKgCents)}"></div>
+        <button class="btn primary big" type="submit">Salvar preço</button>
+      </div>
+      <p class="muted num" style="margin:0" id="kgex"></p>
+      <p class="note" style="margin:0">Pratos já lançados mantêm o preço da hora em que foram pesados.</p>
+    </form>
+    <section class="panel pad sect">
+      <h3 class="h3">Histórico de preços</h3>
+      <div class="tbl-wrap"><table class="num"><thead><tr><th>Desde</th><th class="r">Preço/kg</th></tr></thead>
+        <tbody>${[...S.config.historicoPreco].reverse().map(h => `<tr><td>${dataHora(h.em)}</td><td class="r">${brl(h.precoKgCents)}</td></tr>`).join('')}</tbody></table></div>
+    </section>`;
+  const ex = () => { const v = parseMoney($('#kg').value); $('#kgex').textContent = v > 0 ? `Exemplo: prato de 507 g = ${brl(precoPrato(507, v))}` : 'Digite um valor, ex.: 95,00'; };
+  $('#kg').oninput = ex; ex();
+  $('#kgf').onsubmit = e => {
+    e.preventDefault(); const v = parseMoney($('#kg').value);
+    if (!(v > 0)) { toast('Digite um preço válido, ex.: 95,00'); return; }
+    if (v === S.config.precoKgCents) { toast('O preço já é esse'); return; }
+    acao(async () => { await api('PUT', '/api/config/preco-kg', { precoKgCents: v }); render(); toast(`Quilo agora: ${brl(v)}`); });
+  };
+}
+
+/* ---------- empresa ---------- */
+function cfgEmpresa(el) {
+  const F = (k, rot, ph = '', extra = '') => `<div class="field ${extra}"><label class="label" for="e_${k}">${rot}</label><input class="input" id="e_${k}" data-ek="${k}" value="${esc(S.config[k] || '')}" placeholder="${ph}" autocomplete="off"></div>`;
+  el.innerHTML = `
+    <form class="panel pad sect" id="empf">
+      <div><h1 class="title">Empresa</h1><p class="muted" style="margin:6px 0 0">Esses dados saem no topo do cupom e vão na nota fiscal. Confira com o cartão CNPJ ou com o contador.</p></div>
+      <div class="form-grid">
+        ${F('empresa', 'Nome fantasia', 'Altos Sabores Restaurante')}
+        ${F('razao', 'Razão social', 'Nome no cartão CNPJ')}
+        ${F('cnpj', 'CNPJ', '00.000.000/0000-00')}
+        ${F('ie', 'Inscrição estadual', 'Número da IE')}
+        <div class="field"><label class="label" for="e_regime">Regime tributário</label><select class="input" id="e_regime" data-ek="regime">${['Simples Nacional', 'MEI', 'Lucro Presumido', 'Lucro Real'].map(r => `<option ${S.config.regime === r ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
+        ${F('telefone', 'Telefone', '(00) 00000-0000')}
+        ${F('endereco', 'Endereço (rua e número)', 'Rua, número', 'wide')}
+        ${F('bairro', 'Bairro')}
+        ${F('cidade', 'Cidade')}
+        ${F('uf', 'Estado (UF)', 'Ex.: MG')}
+        ${F('cep', 'CEP', '00000-000')}
+        ${F('rodape', 'Mensagem no fim do cupom', 'Obrigado e volte sempre!', 'wide')}
+      </div>
+      <div class="actions"><button class="btn primary big" type="submit">Salvar dados da empresa</button></div>
+    </form>
+    <section class="panel pad sect"><h3 class="h3">Como fica no cupom</h3><div class="paper-wrap"><div class="paper" id="eprev"></div></div></section>`;
+  const ler = () => { const c = { ...S.config }; el.querySelectorAll('[data-ek]').forEach(i => c[i.dataset.ek] = i.value.trim()); if (c.uf) c.uf = c.uf.toUpperCase(); return c; };
+  const prev = () => { const c = ler(); const p = $('#eprev'); p.style.width = `min(100%, calc(${colunas()}ch + 28px))`; p.textContent = [...cabecalho(c), centro('CUPOM DE EXEMPLO'), lr('Refeição 0,507 kg', '48,17'), lin(), lr('TOTAL', 'R$ 48,17'), '', centro(c.rodape || '')].join('\n'); };
+  el.querySelectorAll('[data-ek]').forEach(i => i.oninput = i.onchange = prev); prev();
+  $('#empf').onsubmit = e => {
+    e.preventDefault(); const c = ler();
+    if (!c.empresa) { toast('O nome fantasia não pode ficar vazio'); return; }
+    acao(async () => { await api('PUT', '/api/config/empresa', c); toast('Dados da empresa salvos'); });
+  };
+}
+
+/* ---------- impressora ---------- */
+const MODELOS = ['Elgin i9', 'Elgin i7', 'Epson TM-T20X', 'Bematech MP-4200 TH', 'Daruma DR800', 'Tanca TP-650', 'Outra (ESC/POS)'];
+const CONEXOES = [['usb', 'USB', 'Cabo ligado no computador'], ['rede', 'Rede', 'Cabo de rede ou Wi-Fi, tem IP'], ['serial', 'Serial (COM)', 'Modelos mais antigos']];
+function cfgImpressora(el) {
+  const st = { ...S.impressora };
+  const draw = () => {
+    const conn = st.conexao === 'usb'
+      ? `<div class="field"><label class="label" for="i_usb">Porta ou nome no Windows</label><input class="input" id="i_usb" data-ik="usb" value="${esc(st.usb)}" placeholder="USB001 ou nome da impressora"></div>`
+      : st.conexao === 'rede'
+        ? `<div class="field"><label class="label" for="i_ip">Endereço IP</label><input class="input num" id="i_ip" data-ik="ip" value="${esc(st.ip)}" placeholder="192.168.0.50"></div>
+           <div class="field"><label class="label" for="i_porta">Porta</label><input class="input num" id="i_porta" data-ik="porta" value="${esc(st.porta)}" placeholder="9100"></div>`
+        : `<div class="field"><label class="label" for="i_com">Porta COM</label><input class="input" id="i_com" data-ik="com" value="${esc(st.com)}" placeholder="COM3"></div>
+           <div class="field"><label class="label" for="i_baud">Velocidade</label><select class="input" id="i_baud" data-ik="baud">${['9600', '19200', '38400', '115200'].map(b => `<option ${st.baud === b ? 'selected' : ''}>${b}</option>`).join('')}</select></div>`;
+    el.innerHTML = `
+      <form class="panel pad sect" id="impf">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <h1 class="title">Impressora</h1>
+          <span class="tag ${S.impressora.testadaEm ? 'ok' : 'off'}">${S.impressora.testadaEm ? 'Teste feito ' + quandoTxt(S.impressora.testadaEm) : 'Ainda não testada'}</span>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label class="label" for="i_mod">Modelo</label><select class="input" id="i_mod" data-ik="modelo">${MODELOS.map(m => `<option ${st.modelo === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
+          <div class="field"><span class="label">Largura do papel</span><div class="seg" role="group">${[80, 58].map(p => `<button type="button" data-pap="${p}" aria-pressed="${+st.papel === p}">${p} mm</button>`).join('')}</div></div>
+        </div>
+        <div class="field"><span class="label">Como ela está ligada</span>
+          <div class="opts" role="group">${CONEXOES.map(([id, n, d]) => `<button type="button" class="opt" data-con="${id}" aria-pressed="${st.conexao === id}">${n}<small>${d}</small></button>`).join('')}</div></div>
+        <div class="form-grid">${conn}</div>
+        <div class="toggles">
+          <label class="switch"><input type="checkbox" data-it="corte" ${st.corte ? 'checked' : ''}> Cortar o papel no fim do cupom</label>
+          <label class="switch"><input type="checkbox" data-it="gaveta" ${st.gaveta ? 'checked' : ''}> Abrir a gaveta quando o pagamento tiver dinheiro</label>
+          <label class="switch"><input type="checkbox" data-it="autoImprimir" ${st.autoImprimir ? 'checked' : ''}> Imprimir o comprovante sozinho ao receber</label>
+        </div>
+        <div class="field" style="max-width:220px"><label class="label" for="i_vias">Vias do comprovante</label><select class="input" id="i_vias" data-ik="vias">${[1, 2].map(v => `<option value="${v}" ${+st.vias === v ? 'selected' : ''}>${v} ${v === 1 ? 'via' : 'vias (cliente e caixa)'}</option>`).join('')}</select></div>
+        <div class="actions"><button class="btn primary big" type="submit">Salvar impressora</button><button class="btn big" type="button" id="itest">Salvar e imprimir teste</button></div>
+        <p class="note" style="margin:0">Este protótipo roda no navegador, então a impressão aparece na tela. No sistema instalado no computador do caixa, o programa manda o cupom direto para a impressora com estes ajustes, corta o papel e abre a gaveta.</p>
+      </form>
+      <section class="panel pad sect">
+        <h3 class="h3">Dicas para ligar a impressora</h3>
+        <ul class="rules">
+          <li><b>USB:</b> instale o driver do fabricante e veja o nome dela em “Impressoras e scanners” do Windows.</li>
+          <li><b>Rede:</b> peça um IP fixo para ela (ex.: 192.168.0.50). A porta quase sempre é 9100.</li>
+          <li><b>Gaveta:</b> o cabo da gaveta de dinheiro vai na impressora, não no computador.</li>
+          <li><b>Papel:</b> impressora de 80 mm imprime 48 letras por linha; a de 58 mm, 32.</li>
+        </ul>
+      </section>`;
+    el.querySelectorAll('[data-ik]').forEach(i => i.oninput = i.onchange = () => { st[i.dataset.ik] = i.dataset.ik === 'vias' ? +i.value : i.value; });
+    el.querySelectorAll('[data-it]').forEach(i => i.onchange = () => { st[i.dataset.it] = i.checked; });
+    el.querySelectorAll('[data-pap]').forEach(b => b.onclick = () => { st.papel = +b.dataset.pap; draw(); });
+    el.querySelectorAll('[data-con]').forEach(b => b.onclick = () => { st.conexao = b.dataset.con; draw(); });
+    const salvar = (extra = {}) => api('PUT', '/api/config/impressora', { ...st, ...extra });
+    $('#impf').onsubmit = e => { e.preventDefault(); acao(async () => { await salvar(); toast('Impressora salva'); viewConfig(); }); };
+    $('#itest').onclick = () => acao(async () => {
+      await salvar({ testadaEm: true });
+      const C = colunas(), I = S.impressora;
+      const onde = I.conexao === 'usb' ? 'USB ' + I.usb : I.conexao === 'rede' ? `Rede ${I.ip}:${I.porta}` : `${I.com} ${I.baud}`;
+      const regua = '1234567890'.repeat(5).slice(0, C);
+      viewConfig();
+      verCupom([...cabecalho(), centro('PÁGINA DE TESTE'), lin(), lr('Modelo', I.modelo), lr('Conexão', onde), lr('Papel', `${I.papel} mm · ${C} colunas`), lr('Corte automático', I.corte ? 'sim' : 'não'), lr('Abrir gaveta', I.gaveta ? 'sim' : 'não'), lin(), regua, 'Acentos: á é í ó ú â ê ô ã õ ç', 'R$ 1.234,56', lin(), centro('Se a régua coube numa linha só'), centro('e os acentos saíram certos,'), centro('a impressora está pronta.')].join('\n'), 'Página de teste');
+    });
+  };
+  draw();
+}
+
+/* ---------- nota fiscal ---------- */
+function cfgFiscal(el) {
+  const feitos = fiscalFeitos();
+  el.innerHTML = `
+    <section class="panel pad sect">
+      <div><h1 class="title">Nota fiscal (NFC-e)</h1>
+      <p style="margin:6px 0 0">A nota do restaurante é a <b>NFC-e</b>, a nota fiscal do consumidor. Ela é emitida pela internet: o sistema manda os dados da venda, a SEFAZ do estado autoriza em poucos segundos e o cupom sai com um QR Code que o cliente pode consultar.</p></div>
+      <div class="flow">
+        <div><b>Comanda paga</b>O caixa confirma o pagamento.</div>
+        <div><b>Sistema envia</b>Os itens e o pagamento vão para o serviço emissor.</div>
+        <div><b>SEFAZ autoriza</b>Leva de 2 a 5 segundos.</div>
+        <div><b>Cupom sai</b>Com QR Code e chave de acesso.</div>
+        <div><b>XML guardado</b>Fica 5 anos e vai para o contador todo mês.</div>
+      </div>
+    </section>
+    ${certHtml()}
+    <section class="panel pad sect">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h3 class="h3">O que precisa antes de ligar a nota</h3><span class="tag ${feitos === CHECK.length ? 'ok' : 'new'} num">${feitos} de ${CHECK.length} prontos</span></div>
+      <div class="bar"><i style="width:${Math.round(100 * feitos / CHECK.length)}%"></i></div>
+      <ul class="check">${CHECK.map(([k, t, d]) => `<li class="${S.fiscal.checklist[k] ? 'done' : ''}"><label><input type="checkbox" data-ck="${k}" ${S.fiscal.checklist[k] ? 'checked' : ''}><span><b>${t}</b><small>${d}</small></span></label></li>`).join('')}</ul>
+      <p class="muted" style="margin:0;font-size:14px">Marque cada item quando estiver resolvido. Os quatro primeiros são com o contador.</p>
+    </section>
+    <section class="panel pad sect">
+      <h3 class="h3">Regras que mudam o dia a dia</h3>
+      <ul class="rules">
+        <li><b>Nota emitida não se edita.</b> Para corrigir, cancela e emite outra. O prazo de cancelamento é curto: em geral 30 minutos, depende do estado.</li>
+        <li><b>Reabrir comanda paga</b> vai cancelar a nota automaticamente, com senha do gerente e motivo.</li>
+        <li><b>Sem internet:</b> a nota sai em modo de contingência e é enviada sozinha quando a internet volta. A venda não para.</li>
+        <li><b>CPF na nota</b> é opcional, só quando o cliente pedir.</li>
+        <li><b>Todo mês</b> o sistema junta os XMLs das notas num arquivo ZIP para o contador.</li>
+      </ul>
+    </section>
+    <section class="panel pad sect">
+      <fieldset class="locked" disabled>
+        <legend>Ajustes da nota · liberados na Fase 2</legend>
+        <div class="form-grid">
+          <div class="field"><label class="label">Serviço emissor</label><select class="input"><option>Escolher na Fase 2</option></select></div>
+          <div class="field"><label class="label">Ambiente</label><select class="input"><option>Homologação (testes)</option><option>Produção</option></select></div>
+          <div class="field"><label class="label">Série</label><input class="input" value="1"></div>
+          <div class="field"><label class="label">Próximo número</label><input class="input" value="1"></div>
+          <div class="field"><label class="label">ID do CSC</label><input class="input" placeholder="000001"></div>
+          <div class="field"><label class="label">CSC (token)</label><input class="input" placeholder="Gerado na SEFAZ"></div>
+          <div class="field"><label class="label">Certificado A1 (.pfx)</label><input class="input" type="file"></div>
+          <div class="field"><label class="label">Senha do certificado</label><input class="input" type="password"></div>
+        </div>
+      </fieldset>
+    </section>`;
+  el.querySelectorAll('[data-ck]').forEach(i => i.onchange = () => acao(async () => { await api('PUT', '/api/config/fiscal', { checklist: { ...S.fiscal.checklist, [i.dataset.ck]: i.checked } }); viewConfig(); }));
+}
+
+function certHtml() {
+  const c = S.fiscal.certificado; if (!c) return '';
+  const d = diasCert();
+  const tag = d > 30 ? `<span class="tag ok num">Válido · faltam ${d} dias</span>` : d > 0 ? `<span class="tag new num">Vence em ${d} dias · renovar</span>` : `<span class="tag bad">Vencido</span>`;
+  return `<section class="panel pad sect">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h3 class="h3">Certificado digital</h3>${tag}</div>
+    <div class="tbl-wrap"><table><tbody>
+      <tr><td class="muted">Empresa</td><td><b>${esc(c.titular)}</b></td></tr>
+      <tr><td class="muted">CNPJ</td><td class="num">${esc(c.cnpj)}</td></tr>
+      <tr><td class="muted">Tipo</td><td>${esc(c.tipo)}</td></tr>
+      <tr><td class="muted">Emitido por</td><td>${esc(c.emissor)}</td></tr>
+      <tr><td class="muted">Validade</td><td class="num">${dataCurta(c.validoDe)} até <b>${dataCurta(c.validoAte)}</b></td></tr>
+    </tbody></table></div>
+    <p class="note" style="margin:0">O arquivo do certificado e a senha <b>não ficam neste protótipo</b>. No sistema de verdade eles ficam só no computador do caixa ou no serviço emissor da nota, protegidos. O sistema avisa no topo da tela 30 dias antes de vencer.</p>
+  </section>`;
+}
+
+/* ---------- usuários ---------- */
+async function cfgUsuarios(el) {
+  el.innerHTML = '<section class="panel pad"><p class="muted" style="margin:0">Carregando usuários…</p></section>';
+  let lista;
+  try { lista = (await api('GET', '/api/usuarios')).usuarios; } catch (e) { el.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  const desenhar = () => {
+    el.innerHTML = `
+    <section class="panel pad sect">
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
+        <div style="min-width:0"><h1 class="title">Usuários</h1><p class="muted" style="margin:6px 0 0">Cada pessoa entra com o próprio e-mail e senha. Assim o sistema registra quem abriu o caixa, quem cancelou e quem tirou item.</p></div>
+        <button class="btn primary big" id="unew">+ Novo usuário</button>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th></th></tr></thead>
+        <tbody>${lista.map(u => `<tr>
+          <td><b>${esc(u.nome)}</b>${u.id === S.usuario.id ? ' <span class="tag ok">você</span>' : ''}</td>
+          <td>${esc(u.email)}</td>
+          <td>${u.perfil === 'gerente' ? 'Gerente' : 'Operador'}</td>
+          <td>${u.ativo ? '<span class="tag ok">ativo</span>' : '<span class="tag off">desativado</span>'}</td>
+          <td class="r"><button class="btn" data-ue="${u.id}">Editar</button></td></tr>`).join('')}</tbody>
+      </table></div>
+    </section>
+    <section class="panel pad sect">
+      <h3 class="h3">O que cada perfil pode fazer</h3>
+      <ul class="rules">
+        <li><b>Operador:</b> balança, comandas, receber, abrir e fechar o caixa, sangria, suprimento, pesquisar e relatório. Para cancelar ou reabrir comanda precisa da senha de um gerente.</li>
+        <li><b>Gerente:</b> tudo do operador, mais produtos, preço do quilo, empresa, impressora, nota fiscal, usuários e backup.</li>
+      </ul>
+    </section>`;
+    $('#unew').onclick = () => usuarioModal();
+    el.querySelectorAll('[data-ue]').forEach(b => b.onclick = () => usuarioModal(lista.find(u => u.id === +b.dataset.ue)));
+  };
+  function usuarioModal(u) {
+    openModal(`
+      <div class="m-head"><h3>${u ? 'Editar usuário' : 'Novo usuário'}</h3>${xBtn}</div>
+      <form class="m-body" id="uf" autocomplete="off">
+        <div class="field"><label class="label" for="un">Nome</label><input class="input" id="un" value="${esc(u?.nome || '')}" autofocus></div>
+        <div class="field"><label class="label" for="ue">E-mail (login)</label><input class="input" id="ue" type="email" value="${esc(u?.email || '')}" ${u ? 'disabled' : ''}></div>
+        <div class="field"><span class="label">Perfil</span><div class="opts" role="group">
+          ${[['operador', 'Operador', 'Balança, comandas e caixa'], ['gerente', 'Gerente', 'Tudo, inclusive configurações']].map(([id, n, d]) => `<button type="button" class="opt" data-up="${id}" aria-pressed="${(u?.perfil || 'operador') === id}">${n}<small>${d}</small></button>`).join('')}</div></div>
+        <div class="field"><label class="label" for="us">${u ? 'Nova senha (deixe em branco para manter)' : 'Senha inicial'}</label><input class="input" id="us" type="password" autocomplete="new-password"></div>
+        <p class="muted" style="margin:0;font-size:14px">Pelo menos 8 caracteres. Passe a senha para a pessoa em particular; ela pode trocar depois em “Minha senha”.</p>
+        ${u ? `<label class="switch"><input type="checkbox" id="ua" ${u.ativo ? 'checked' : ''}> Pode entrar no sistema</label>` : ''}
+        <p class="err" id="uerr" hidden></p>
+      </form>
+      <div class="m-foot"><button class="btn" data-close>Cancelar</button><button class="btn primary" type="submit" form="uf" id="uok">${u ? 'Salvar' : 'Criar usuário'}</button></div>`, r => {
+      let perfil = u?.perfil || 'operador';
+      r.querySelectorAll('[data-up]').forEach(b => b.onclick = () => { perfil = b.dataset.up; r.querySelectorAll('[data-up]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+      $('#uf', r).onsubmit = async e => {
+        e.preventDefault();
+        const er = t => { $('#uerr', r).textContent = t; $('#uerr', r).hidden = false; };
+        const senha = $('#us', r).value;
+        if ((!u || senha) && senha.length < 8) return er('A senha precisa ter pelo menos 8 caracteres.');
+        const b = $('#uok', r); b.disabled = true;
+        try {
+          const d = u ? await api('PATCH', `/api/usuarios/${u.id}`, { nome: $('#un', r).value, perfil, ativo: $('#ua', r).checked, ...(senha ? { senha } : {}) })
+                      : await api('POST', '/api/usuarios', { nome: $('#un', r).value, email: $('#ue', r).value, perfil, senha });
+          lista = d.usuarios; closeModal(); desenhar(); toast(u ? 'Usuário salvo' : 'Usuário criado');
+        } catch (x) { er(x.message); b.disabled = false; }
+      };
+    });
+  }
+  desenhar();
+}
+
+/* ---------- minha senha ---------- */
+function cfgConta(el) {
+  el.innerHTML = `
+    <form class="panel pad sect" id="cf2" autocomplete="off">
+      <h1 class="title">Minha senha</h1>
+      <p class="muted" style="margin:0">Você está como <b>${esc(S.usuario.nome)}</b> (${esc(S.usuario.email)}).</p>
+      <div class="form-grid">
+        <div class="field"><label class="label" for="sa">Senha atual</label><input class="input" id="sa" type="password" autocomplete="current-password"></div>
+        <div class="field"><label class="label" for="sn">Nova senha</label><input class="input" id="sn" type="password" autocomplete="new-password"></div>
+        <div class="field"><label class="label" for="sc">Repita a nova senha</label><input class="input" id="sc" type="password" autocomplete="new-password"></div>
+      </div>
+      <p class="err" id="cerr2" hidden></p>
+      <div><button class="btn primary big" type="submit">Trocar senha</button></div>
+    </form>`;
+  $('#cf2').onsubmit = e => {
+    e.preventDefault();
+    const er = t => { $('#cerr2').textContent = t; $('#cerr2').hidden = false; };
+    const nova = $('#sn').value;
+    if (nova.length < 8) return er('A nova senha precisa ter pelo menos 8 caracteres.');
+    if (nova !== $('#sc').value) return er('As duas senhas novas não são iguais.');
+    acao(async () => {
+      try { await api('PUT', '/api/conta/senha', { atual: $('#sa').value, nova }); } catch (x) { return er(x.message); }
+      $('#cerr2').hidden = true; ['#sa', '#sn', '#sc'].forEach(s => $(s).value = ''); toast('Senha trocada');
+    });
+  };
+}
+
+/* ---------- backup ---------- */
+function cfgBackup(el) {
+  el.innerHTML = `
+    <section class="panel pad sect">
+      <h1 class="title">Backup</h1>
+      <p style="margin:0">As comandas, vendas, produtos, usuários e fechamentos ficam num arquivo de banco de dados no computador do caixa: <b>sistema/dados/restaurante.db</b>. Faça uma cópia toda semana e guarde fora do computador (pendrive ou Google Drive).</p>
+      <div><a class="btn primary big" href="/api/backup" download>Baixar cópia de segurança</a></div>
+    </section>
+    <section class="panel pad sect">
+      <h3 class="h3">Como voltar uma cópia</h3>
+      <ul class="rules">
+        <li>Feche a janela do sistema no computador do caixa.</li>
+        <li>Na pasta <b>sistema/dados</b>, apague <b>restaurante.db-wal</b> e <b>restaurante.db-shm</b> (se existirem).</li>
+        <li>Troque o <b>restaurante.db</b> pelo arquivo da cópia, com o mesmo nome.</li>
+        <li>Abra o sistema de novo.</li>
+      </ul>
+    </section>`;
+}
+
+/* ---------- atalhos ---------- */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modalOpen()) { closeModal(); return; }
+  if (modalOpen()) return;
+  if (e.key === 'F2') { e.preventDefault(); if (ui.tab !== 'comandas') go('comandas'); $('#newn') && $('#newn').focus(); }
+  if (e.key === 'F3') { e.preventDefault(); if (ui.tab !== 'pesquisar') go('pesquisar'); else $('#q').select(); }
+  if (e.key === 'F6') { e.preventDefault(); go('balanca'); }
+  if (e.key === 'F4') { e.preventDefault(); if (ui.tab === 'balanca') { $('#bpeso').focus(); return; } if (ui.tab !== 'comandas') go('comandas'); $('#peso') ? $('#peso').focus() : toast('Abra ou selecione uma comanda primeiro'); }
+  if (e.key === 'F8') { e.preventDefault(); if (ui.tab === 'caixa') { const c = abertas().find(x => x.id === ui.cx); if (c) abrirPagamento(c); return; } const c = selecionada(); if (ui.tab === 'comandas' && c && c.status === 'aberta') abrirPagamento(c); }
+});
+setInterval(() => { if (ui.tab === 'comandas' && !modalOpen() && !document.activeElement?.matches('input')) { const y = window.scrollY; viewComandas(); window.scrollTo(0, y); } }, 60000);
+
+iniciar();
+</script>

@@ -1,0 +1,12 @@
+{
+  "name": "altos-sabores-caixa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de caixa do restaurante por quilo Altos Sabores",
+  "main": "servidor.js",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --no-warnings servidor.js",
+    "test": "node --no-warnings --test test/servidor.test.js"
+  }
+}

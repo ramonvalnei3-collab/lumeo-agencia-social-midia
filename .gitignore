@@ -4,3 +4,9 @@
 *.pem
 *.key
 .env
+# banco de dados do restaurante (fica só no computador do caixa)
+sistema/dados/
+*.db
+*.db-wal
+*.db-shm
+node_modules/

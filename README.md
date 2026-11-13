@@ -6,7 +6,8 @@ Sistema de frente de caixa (PDV) para o restaurante por quilo **Altos Sabores**:
 
 | Pasta | Conteúdo |
 |---|---|
-| `prototipo/` | Protótipo navegável da Fase 1 (abra `prototipo/index.html` no navegador). Os dados ficam só no navegador. |
+| `sistema/` | **O sistema de verdade**: servidor com banco de dados (SQLite) e login por e-mail e senha. Veja `sistema/README.md` para instalar no computador do caixa. |
+| `prototipo/` | Protótipo navegável (abra `prototipo/index.html` no navegador). Os dados ficam só no navegador; serve para testar telas. |
 | `docs/PROMPT-SISTEMA.md` | O prompt/especificação completa do sistema, por fases. |
 | `docs/logo-altos-sabores.jpg` | Logo original. |
 
