@@ -693,7 +693,7 @@ function renderTop() {
   const st = $('#status'); st.classList.toggle('alert', dc !== null && dc <= 30);
   if (dc !== null && dc <= 30) { st.innerHTML = `<span class="dot off"></span>${dc > 0 ? `Certificado vence em ${dc} ${dc === 1 ? 'dia' : 'dias'}` : 'Certificado vencido'}`; return; }
   $('#status').innerHTML = S.caixa.aberto
-    ? `<span class="dot"></span>Caixa aberto · ${esc(S.caixa.operador)}`
+    ? `<span class="dot"></span>Caixa aberto · ${esc(String(S.caixa.operador).split(' ')[0])}`
     : `<span class="dot off"></span>Caixa fechado`;
 }
 function go(tab) { ui.tab = tab; try { localStorage.setItem(STORE_KEY + ':tab', tab); } catch (e) {} render(); window.scrollTo(0, 0); }
