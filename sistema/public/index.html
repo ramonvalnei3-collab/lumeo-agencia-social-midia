@@ -474,7 +474,7 @@ function quandoTxt(t) {
 
 /* ---------- estado ---------- */
 /* ---------- conversa com o servidor ---------- */
-let S = null, versaoLocal = 0, ocupado = false;
+let S = null, versaoLocal = 0, ocupado = false, MODO = 'local';
 async function api(metodo, url, corpo) {
   let r;
   try {
@@ -499,7 +499,8 @@ async function iniciar() {
   let d;
   try { d = await (await fetch('/api/auth/estado', { credentials: 'same-origin' })).json(); }
   catch (e) { return telaAviso('Não consegui falar com o sistema', 'Confira se o programa do caixa está aberto e se este computador está na mesma rede.'); }
-  if (!d.usuario) return d.temUsuarios ? telaLogin() : telaPrimeiroAcesso(d.local);
+  MODO = d.modo || 'local';
+  if (!d.usuario) return d.temUsuarios ? telaLogin() : telaPrimeiroAcesso(d);
   try { aplicarEstado(await api('GET', '/api/estado')); } catch (e) { return; }
   document.body.classList.remove('sem-login');
   render();
@@ -532,12 +533,15 @@ function telaLogin(msg) {
     catch (x) { $('#lerr').textContent = x.message; $('#lerr').hidden = false; $('#ls').select(); b.disabled = false; }
   };
 }
-function telaPrimeiroAcesso(local) {
-  if (!local) return telaAviso('Falta criar o acesso do gerente', 'O primeiro acesso precisa ser criado no computador onde o sistema está instalado, pelo endereço http://localhost:3000.');
+function telaPrimeiroAcesso(d) {
+  const nuvem = d.modo === 'nuvem';
+  if (!nuvem && !d.local) return telaAviso('Falta criar o acesso do gerente', 'O primeiro acesso precisa ser criado no computador onde o sistema está instalado, pelo endereço http://localhost:3000.');
+  if (nuvem && !d.codigoConfigurado) return telaAviso('Falta o código de primeiro acesso', 'Na Vercel, abra o projeto → Settings → Environment Variables e crie CODIGO_PRIMEIRO_ACESSO com uma senha sua (pelo menos 8 caracteres). Depois faça um novo deploy e volte aqui.');
   telaEntrada(`
     <h1 class="title">Primeiro acesso</h1>
     <p style="margin:0">Crie o acesso do <b>gerente</b>. Com ele você cadastra os produtos, ajusta o sistema e cria o login de cada funcionário.</p>
     <form class="sect" id="paf">
+      ${nuvem ? `<div class="field"><label class="label" for="pacod">Código de primeiro acesso</label><input class="input" id="pacod" type="password" autocomplete="off" required><small class="muted">É o CODIGO_PRIMEIRO_ACESSO que você colocou na Vercel.</small></div>` : ''}
       <div class="field"><label class="label" for="pan">Seu nome</label><input class="input" id="pan" autocomplete="name" required></div>
       <div class="field"><label class="label" for="pae">E-mail (vai ser o seu login)</label><input class="input" id="pae" type="email" autocomplete="username" required></div>
       <div class="field"><label class="label" for="pas">Senha</label><input class="input" id="pas" type="password" autocomplete="new-password" required></div>
@@ -546,7 +550,7 @@ function telaPrimeiroAcesso(local) {
       <p class="err" id="paerr" hidden></p>
       <button class="btn primary huge" type="submit" id="paok">Criar acesso e entrar</button>
     </form>`);
-  $('#pan').focus();
+  (nuvem ? $('#pacod') : $('#pan')).focus();
   $('#paf').onsubmit = async e => {
     e.preventDefault();
     const er = t => { $('#paerr').textContent = t; $('#paerr').hidden = false; };
@@ -554,7 +558,7 @@ function telaPrimeiroAcesso(local) {
     if (senha.length < 8) return er('A senha precisa ter pelo menos 8 caracteres.');
     if (senha !== $('#pac').value) return er('As duas senhas não são iguais.');
     const b = $('#paok'); b.disabled = true;
-    try { await api('POST', '/api/auth/primeiro-acesso', { nome: $('#pan').value, email: $('#pae').value, senha }); await iniciar(); toast('Acesso criado. Bem-vindo!'); }
+    try { await api('POST', '/api/auth/primeiro-acesso', { nome: $('#pan').value, email: $('#pae').value, senha, codigo: nuvem ? $('#pacod').value : undefined }); await iniciar(); toast('Acesso criado. Bem-vindo!'); }
     catch (x) { er(x.message); b.disabled = false; }
   };
 }
@@ -567,8 +571,9 @@ function menuUsuario() {
     $('#msair', r).onclick = async () => { try { await api('POST', '/api/auth/sair', {}); } catch (e) {} telaLogin('Você saiu do sistema.'); };
   });
 }
-/* outros computadores (ex.: a balança) mexem nas comandas: confere a cada 4 segundos */
-setInterval(async () => {
+/* outros computadores (ex.: a balança) mexem nas comandas: confere de tempos em tempos
+   (4 s no computador do caixa, 8 s na nuvem para gastar menos acessos) */
+async function conferirMudancas() {
   if (!S || modalOpen() || document.hidden || ocupado) return;
   try {
     const d = await (await fetch('/api/versao', { credentials: 'same-origin' })).json();
@@ -580,7 +585,8 @@ setInterval(async () => {
     aplicarEstado(await r.json());
     const y = window.scrollY; render(); window.scrollTo(0, y);
   } catch (e) {}
-}, 4000);
+}
+(function ciclo() { setTimeout(async () => { await conferirMudancas(); ciclo(); }, MODO === 'nuvem' ? 8000 : 4000); })();
 
 const ui = { tab: 'comandas', lista: 'abertas', sel: null, busca: '', cat: 'Bebida', q: '', fStatus: 'todas', fPeriodo: '7', cfg: 'produtos', pq: '', pcat: 'todas', cx: null, bcmd: '', flash: null };
 try { const t = localStorage.getItem(STORE_KEY + ':tab'); if (t) ui.tab = t; } catch (e) {}
@@ -1827,20 +1833,21 @@ function cfgConta(el) {
 
 /* ---------- backup ---------- */
 function cfgBackup(el) {
+  const nuvem = MODO === 'nuvem';
   el.innerHTML = `
     <section class="panel pad sect">
       <h1 class="title">Backup</h1>
-      <p style="margin:0">As comandas, vendas, produtos, usuários e fechamentos ficam num arquivo de banco de dados no computador do caixa: <b>sistema/dados/restaurante.db</b>. Faça uma cópia toda semana e guarde fora do computador (pendrive ou Google Drive).</p>
+      <p style="margin:0">${nuvem
+        ? 'O banco de dados está na nuvem (Neon), que já guarda cópias automáticas. Mesmo assim, baixe uma cópia por semana e guarde fora (pendrive ou Google Drive).'
+        : 'O banco de dados fica no computador do caixa, no arquivo <b>sistema/dados/restaurante.db</b>. Baixe uma cópia por semana e guarde fora do computador (pendrive ou Google Drive).'}</p>
       <div><a class="btn primary big" href="/api/backup" download>Baixar cópia de segurança</a></div>
+      <p class="muted" style="margin:0;font-size:14px">A cópia é um arquivo .json com produtos, comandas, pagamentos, caixas, usuários e configurações. As senhas vão embaralhadas, como estão no banco.</p>
     </section>
     <section class="panel pad sect">
-      <h3 class="h3">Como voltar uma cópia</h3>
-      <ul class="rules">
-        <li>Feche a janela do sistema no computador do caixa.</li>
-        <li>Na pasta <b>sistema/dados</b>, apague <b>restaurante.db-wal</b> e <b>restaurante.db-shm</b> (se existirem).</li>
-        <li>Troque o <b>restaurante.db</b> pelo arquivo da cópia, com o mesmo nome.</li>
-        <li>Abra o sistema de novo.</li>
-      </ul>
+      <h3 class="h3">Se precisar voltar uma cópia</h3>
+      <p style="margin:0">${nuvem
+        ? 'Na Neon dá para voltar o banco para um horário anterior (menu Branches → Restore). Peça ajuda antes de fazer: voltar apaga o que foi lançado depois.'
+        : 'Feche a janela do sistema, guarde o arquivo <b>restaurante.db</b> atual em outro lugar e peça ajuda para carregar a cópia. Não apague nada antes disso.'}</p>
     </section>`;
 }
 

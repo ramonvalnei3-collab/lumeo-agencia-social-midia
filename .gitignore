@@ -10,3 +10,4 @@ sistema/dados/
 *.db-wal
 *.db-shm
 node_modules/
+.vercel/

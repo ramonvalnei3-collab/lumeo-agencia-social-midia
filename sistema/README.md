@@ -1,9 +1,38 @@
 # Sistema de caixa · Altos Sabores
 
-Programa que roda no **computador do caixa** e guarda tudo num banco de dados (arquivo `dados/restaurante.db`).
-A balança e outros computadores da mesma rede abrem o sistema pelo navegador.
+O mesmo sistema roda de dois jeitos:
 
-## Instalar (uma vez só, no computador do caixa)
+| | **Na internet (Vercel)** | **No computador do caixa** |
+|---|---|---|
+| Abre de onde | Qualquer lugar, com o endereço do site | Só nos computadores da rede do restaurante |
+| Banco de dados | Postgres na nuvem (Neon) | Arquivo `dados/restaurante.db` |
+| Sem internet | **Não funciona** | Funciona |
+| Custo | Vercel Pro (US$ 20/mês, uso comercial) + Neon (grátis no começo) | Só o computador |
+
+## Publicar na Vercel (passo a passo)
+
+1. Entre em **vercel.com** com a sua conta do GitHub.
+2. **Add New → Project** → escolha o repositório `lumeo-agencia-social-midia` → **Import**.
+3. Em **Root Directory**, clique em *Edit* e escolha a pasta **`sistema`**. Framework: *Other*. Clique em **Deploy**.
+   (O primeiro deploy vai abrir o site com o aviso "Falta o banco de dados"; é normal.)
+4. No projeto, aba **Storage → Create Database → Neon (Postgres)**. Escolha a região **São Paulo (sa-east-1)**
+   e conecte ao projeto. A Vercel cria sozinha a variável `DATABASE_URL`.
+5. Aba **Settings → Environment Variables**: crie **`CODIGO_PRIMEIRO_ACESSO`** com uma senha só sua
+   (pelo menos 8 caracteres). Ela serve só para criar o primeiro gerente.
+6. Aba **Deployments** → nos três pontinhos do último deploy → **Redeploy**.
+7. Abra o endereço do site (algo como `altos-sabores.vercel.app`): aparece **Primeiro acesso**.
+   Digite o código do passo 5, seu nome, e-mail e senha. Pronto.
+
+Depois disso, todo envio para o GitHub atualiza o site sozinho.
+
+**Atenção:**
+- O plano grátis da Vercel (Hobby) é só para uso pessoal, sem fins comerciais. Para o restaurante use o **Pro**.
+- Na nuvem, se a internet do restaurante cair, o sistema para até ela voltar. Tenha um plano B
+  (por exemplo, internet do celular roteada) ou use o modo do computador do caixa.
+- A impressora térmica fica no restaurante; a impressão automática vai precisar de um pequeno programa
+  no computador do caixa (próxima etapa).
+
+## Instalar no computador do caixa (sem internet)
 
 1. Instale o **Node.js** versão 22.13 ou mais nova: <https://nodejs.org> (botão "LTS").
 2. Copie esta pasta `sistema` para o computador, por exemplo em `C:\AltosSabores\sistema`.
@@ -39,15 +68,19 @@ Não precisa instalar mais nada: o banco de dados e a criptografia das senhas j�
 
 ## Backup
 
-Em **Configurações → Backup** o gerente baixa uma cópia do banco. Faça toda semana e guarde fora do computador.
+Em **Configurações → Backup** o gerente baixa uma cópia (arquivo .json). Faça toda semana e guarde fora do computador.
+Na nuvem, a Neon também guarda o histórico do banco e permite voltar para um horário anterior.
 
 ## Para quem programa
 
 ```
-npm test     # testes do servidor (login, permissões, preços, troco, fechamento de caixa)
-npm start    # sobe em http://localhost:3000  (PORTA=8080 npm start para outra porta)
+npm install  # só precisa para o modo nuvem (driver do Postgres)
+npm test     # testes no SQLite; com TEST_DATABASE_URL=postgres://... roda também no Postgres
+npm start    # sobe em http://localhost:3000 (SQLite); com DATABASE_URL sobe usando o Postgres
 ```
 
-- `servidor.js`: HTTP, login, sessões e rotas `/api/...`
-- `banco.js`: esquema SQLite (`node:sqlite`) e regras de negócio
+- `servidor.js`: HTTP, login, sessões e rotas `/api/...` (`criarApp` serve os dois modos)
+- `api/index.js` + `vercel.json`: entrada na Vercel (região São Paulo, `gru1`)
+- `banco.js`: esquema e regras de negócio, iguais nos dois bancos
+- `adaptadores.js`: SQLite (`node:sqlite`) e Postgres (`pg`)
 - `public/index.html`: a tela
