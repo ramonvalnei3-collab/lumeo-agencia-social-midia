@@ -1,0 +1,20 @@
+﻿Codigo;Produto;Categoria;Unidade;Preco (R$);NCM;CFOP;CSOSN ou CST;CEST;Origem;Observacao do contador
+-;Refeição por quilo (self-service);Comida;KG;95,00;;;;;;
+101;Refrigerante lata 350ml;Bebida;UN;6,00;;;;;;
+102;Refrigerante 600ml;Bebida;UN;8,00;;;;;;
+103;Refrigerante 2L;Bebida;UN;14,00;;;;;;
+104;Água mineral 500ml;Bebida;UN;4,00;;;;;;
+105;Água com gás 500ml;Bebida;UN;4,50;;;;;;
+106;Suco natural 400ml;Bebida;UN;9,00;;;;;;
+107;Suco de laranja 400ml;Bebida;UN;9,00;;;;;;
+108;Água de coco 300ml;Bebida;UN;7,00;;;;;;
+109;Cerveja long neck;Bebida;UN;10,00;;;;;;
+110;Cerveja lata 350ml;Bebida;UN;7,00;;;;;;
+201;Pudim;Sobremesa;UN;8,00;;;;;;
+202;Mousse de maracujá;Sobremesa;UN;7,00;;;;;;
+203;Sorvete (bola);Sobremesa;UN;6,00;;;;;;
+204;Salada de frutas;Sobremesa;UN;7,50;;;;;;
+205;Brigadeiro;Sobremesa;UN;3,00;;;;;;
+206;Doce de leite;Sobremesa;UN;5,00;;;;;;
+301;Café;Outros;UN;3,00;;;;;;
+302;Embalagem marmitex;Outros;UN;2,00;;;;;;
