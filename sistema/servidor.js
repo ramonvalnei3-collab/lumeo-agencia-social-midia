@@ -116,7 +116,12 @@ async function criarApp({ url, arquivo, codigoPrimeiroAcesso } = {}) {
   // caixa
   rota('POST', '/api/caixa/abrir', LOGADO, async ({ quem, corpo }) => { await B.abrirCaixa(corpo.fundoCents, quem); return comEstado(quem); });
   rota('POST', '/api/caixa/movimentos', LOGADO, async ({ quem, corpo }) => comEstado(quem, { id: await B.movimentarCaixa(corpo.tipo, corpo.valorCents, corpo.motivo, quem) }));
-  rota('POST', '/api/caixa/fechar', LOGADO, async ({ quem, corpo }) => comEstado(quem, { fechamento: await B.fecharCaixa(corpo.contado, quem) }));
+  rota('POST', '/api/caixa/fechar', LOGADO, async ({ quem, corpo }) => {
+    const f = await B.fecharCaixa(corpo.contado, quem, { observacao: corpo.observacao, contagem: corpo.contagem });
+    return comEstado(quem, { fechamento: f, relatorio: await B.relatorioCaixa(f.id) });
+  });
+  rota('GET', '/api/caixa/relatorio', LOGADO, async () => ({ relatorio: await B.relatorioCaixa(null) }));
+  rota('GET', '/api/caixas/:id/relatorio', LOGADO, async ({ p }) => ({ relatorio: await B.relatorioCaixa(Number(p.id)) }));
 
   // produtos e categorias (gerente)
   rota('POST', '/api/produtos', GERENTE, async ({ quem, corpo }) => comEstado(quem, { id: await B.criarProduto(corpo) }));

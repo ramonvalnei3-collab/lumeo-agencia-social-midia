@@ -378,6 +378,24 @@ details.note summary { cursor: pointer; font-weight: 600; color: var(--ink); }
 .entrada-card { width: min(420px, 100%); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
 .entrada-logo { height: 64px; width: auto; align-self: flex-start; border-radius: 8px; margin-bottom: 6px; }
 
+.passos { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; color: var(--text-2); font-size: 14px; }
+.cedulas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 12px; }
+.ced { display: flex; align-items: center; gap: 8px; }
+.ced span { width: 76px; font-weight: 600; font-size: 13px; text-align: right; color: var(--ink); flex-shrink: 0; }
+.ced .input { min-height: 34px; padding: 5px 8px; text-align: right; }
+.ced-tot { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 12px; color: var(--ink); }
+.ced-tot b { font-size: 18px; }
+.conta { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--r-sm); background: #fff; }
+.conta > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-top: 1px solid var(--line); }
+.conta > div:first-child { border-top: 0; }
+.conta .soma { font-weight: 600; background: #FAFAF9; }
+.rel { gap: 20px; }
+.rel h4 { margin: 0 0 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.rel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.rel .stats { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.rel .stat { box-shadow: none; padding: 12px 14px; }
+.rel .stat .v { font-size: 20px; }
+textarea.input { min-height: 64px; resize: vertical; font: inherit; }
 @media (max-width: 1180px) { .tab .kbd { display: none; } }
 @media (max-width: 980px) {
   .pos, .bal, .cfg, .cxg { grid-template-columns: minmax(0, 1fr); }
@@ -1088,6 +1106,7 @@ function viewCaixa() {
       try { await api('POST', '/api/caixa/abrir', { fundoCents: f }); render(); toast('Caixa aberto'); }
       catch (x) { $('#aerr').textContent = x.message; $('#aerr').hidden = false; }
     };
+    ligarRelatorios();
     return;
   }
   const R = resumoCaixa();
@@ -1120,7 +1139,7 @@ function viewCaixa() {
           <tbody>${FORMAS.map(f => `<tr><td>${f.nome}${f.id === 'dinheiro' ? ' <span class="muted">(já sem troco)</span>' : ''}</td><td class="r">${brl(R.porForma[f.id])}</td></tr>`).join('')}</tbody>
           <tfoot><tr><td>Total</td><td class="r">${brl(R.totalVendas)}</td></tr></tfoot>
         </table></div>
-        <button class="btn primary big" id="fechar">Fechar caixa</button>
+        <div class="actions"><button class="btn big grow" id="parcial">Conferência parcial</button><button class="btn primary big grow" id="fechar">Fechar caixa</button></div>
       </section>
       <section class="panel pad sect">
         <h3 class="h3">Sangria e suprimento</h3>
@@ -1153,6 +1172,7 @@ function viewCaixa() {
   $('#sang').onclick = () => movimento('sangria');
   $('#supr').onclick = () => movimento('suprimento');
   $('#fechar').onclick = fecharCaixa;
+  ligarRelatorios();
 }
 function rboxHtml(c) {
   return `<div class="rbox">
@@ -1190,64 +1210,209 @@ function movimento(tipo) {
     };
   });
 }
+/* ---------- fechamento de caixa e relatório ---------- */
+const CEDULAS = [20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 25, 10, 5];
+const nomeCedula = v => brl(v);
+const sinal = v => v === 0 ? 'ok' : (v > 0 ? 'sobra ' : 'falta ') + brl(Math.abs(v));
+const sinalCurto = v => v === 0 ? 'ok' : (v > 0 ? '+' : '-') + n2(Math.abs(v));
+const duracao = (a, b) => { const m = Math.max(0, Math.round((b - a) / 60000)); return `${Math.floor(m / 60)}h${String(m % 60).padStart(2, '0')}`; };
+
 function fecharCaixa() {
   const ab = abertas();
   const go2 = () => {
     const R = resumoCaixa();
     const linhas = FORMAS.filter(f => R.esperado[f.id] || f.id === 'dinheiro');
     openModal(`
-      <div class="m-head"><h3>Fechar caixa · conferência</h3>${xBtn}</div>
+      <div class="m-head"><h3>Fechar caixa</h3>${xBtn}</div>
       <div class="m-body">
-        <p class="muted" style="margin:0">Conte o dinheiro da gaveta e some os comprovantes da maquininha. Digite o que contou; o sistema mostra se sobrou ou faltou.</p>
+        <ol class="passos">
+          <li>Conte o dinheiro da gaveta. Se quiser, use o contador de notas e moedas.</li>
+          <li>Some os comprovantes da maquininha (débito, crédito, vales) e confira os Pix no extrato.</li>
+          <li>Digite o que contou em cada forma. O sistema mostra se sobrou ou faltou.</li>
+        </ol>
+        <details class="note" id="contdet">
+          <summary>Contar notas e moedas da gaveta</summary>
+          <div class="cedulas">${CEDULAS.map(v => `<label class="ced"><span>${nomeCedula(v)}</span><input class="input num" data-ced="${v}" inputmode="numeric" placeholder="0" aria-label="Quantidade de ${nomeCedula(v)}"></label>`).join('')}</div>
+          <div class="ced-tot">Total na gaveta: <b class="num" id="cedTot">R$ 0,00</b><span class="muted">vai direto para “Dinheiro”</span></div>
+        </details>
         <div class="tbl-wrap"><table class="num">
           <thead><tr><th>Forma</th><th class="r">Sistema</th><th class="r">Contado</th><th class="r">Diferença</th></tr></thead>
           <tbody>${linhas.map(f => `<tr><td>${f.nome}</td><td class="r">${brl(R.esperado[f.id])}</td>
             <td class="r"><input class="input num" style="width:120px;text-align:right;padding:6px 8px" data-ct="${f.id}" inputmode="decimal" value="${n2(R.esperado[f.id])}" aria-label="Contado em ${f.nome}"></td>
-            <td class="r" data-df="${f.id}">${brl(0)}</td></tr>`).join('')}</tbody>
+            <td class="r" data-df="${f.id}"></td></tr>`).join('')}</tbody>
           <tfoot><tr><td>Total</td><td class="r">${brl(linhas.reduce((s, f) => s + R.esperado[f.id], 0))}</td><td class="r" id="ctTot"></td><td class="r" id="dfTot"></td></tr></tfoot>
         </table></div>
-        <p class="note" style="margin:0">O dinheiro do sistema já inclui o fundo de troco (${brl(S.caixa.fundoCents)}), suprimentos (${brl(R.sup)}) e desconta sangrias (${brl(R.san)}).</p>
+        <div class="conta num">
+          <div><span>Fundo de troco (abertura)</span><span>+ ${brl(S.caixa.fundoCents)}</span></div>
+          <div><span>Dinheiro recebido − troco dado</span><span>+ ${brl(R.porForma.dinheiro)}</span></div>
+          <div><span>Suprimentos</span><span>+ ${brl(R.sup)}</span></div>
+          <div><span>Sangrias (retiradas)</span><span>− ${brl(R.san)}</span></div>
+          <div class="soma"><span>Deveria ter na gaveta</span><span>${brl(R.esperado.dinheiro)}</span></div>
+        </div>
+        <div class="field"><label class="label" for="obs">Observação (opcional)</label><textarea class="input" id="obs" rows="2" placeholder="Ex.: falta de R$ 5,00, troco dado errado na comanda 31"></textarea></div>
+        <p class="err" id="ferr2" hidden></p>
       </div>
-      <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" id="cfin">Fechar caixa e imprimir</button></div>`, r => {
+      <div class="m-foot"><button class="btn" data-close>Voltar</button><button class="btn primary" id="cfin">Fechar caixa</button></div>`, r => {
       const lerContado = () => Object.fromEntries(linhas.map(f => { const v = parseMoney($(`[data-ct="${f.id}"]`, r).value); return [f.id, isNaN(v) ? 0 : v]; }));
+      const lerContagem = () => Object.fromEntries(CEDULAS.map(v => [v, parseInt($(`[data-ced="${v}"]`, r).value, 10) || 0]).filter(([, q]) => q > 0));
       const upd = () => {
         const ct = lerContado(); let td = 0, tc = 0;
         linhas.forEach(f => {
           const d = ct[f.id] - R.esperado[f.id]; td += d; tc += ct[f.id];
-          const el = $(`[data-df="${f.id}"]`, r);
-          el.textContent = d === 0 ? 'ok' : (d > 0 ? 'sobra ' : 'falta ') + brl(Math.abs(d));
-          el.className = 'r ' + (d === 0 ? 'diff-ok' : 'diff-bad');
+          const el = $(`[data-df="${f.id}"]`, r); el.textContent = sinal(d); el.className = 'r ' + (d === 0 ? 'diff-ok' : 'diff-bad');
         });
         $('#ctTot', r).textContent = brl(tc);
-        $('#dfTot', r).textContent = td === 0 ? 'ok' : (td > 0 ? 'sobra ' : 'falta ') + brl(Math.abs(td));
-        $('#dfTot', r).className = 'r ' + (td === 0 ? 'diff-ok' : 'diff-bad');
+        $('#dfTot', r).textContent = sinal(td); $('#dfTot', r).className = 'r ' + (td === 0 ? 'diff-ok' : 'diff-bad');
       };
-      r.querySelectorAll('[data-ct]').forEach(i => i.oninput = upd); upd();
+      r.querySelectorAll('[data-ct]').forEach(i => i.oninput = upd);
+      r.querySelectorAll('[data-ced]').forEach(i => i.oninput = () => {
+        const tot = Object.entries(lerContagem()).reduce((s, [v, q]) => s + v * q, 0);
+        $('#cedTot', r).textContent = brl(tot);
+        $('[data-ct="dinheiro"]', r).value = n2(tot); upd();
+      });
+      upd();
       $('#cfin', r).onclick = async () => {
-        const ct = lerContado();
-        let fch;
-        try { fch = (await api('POST', '/api/caixa/fechar', { contado: ct })).fechamento; } catch (x) { toast(x.message); return; }
-        closeModal(); render();
-        const L = [...cabecalho(), centro('FECHAMENTO DE CAIXA'), lr('Operador', fch.operador), lr('Abertura', dataHora(fch.abertoEm)), lr('Fechamento', dataHora(fch.fechadoEm)), lin(),
-          lr('Comandas pagas', fch.comandas), lr('Total de vendas', brl(fch.totalVendasCents)), lr('Fundo de troco', brl(fch.fundoCents)), lr('Suprimentos', brl(fch.suprimentosCents)), lr('Sangrias', brl(fch.sangriasCents)), lin(),
-          lr('FORMA', 'SISTEMA / CONTADO'), ...linhas.map(f => lr(f.nome, `${n2(fch.esperado[f.id])} / ${n2(ct[f.id])}`)), lin(),
-          lr('DIFERENÇA', (fch.diferencaCents > 0 ? '+' : '') + brl(fch.diferencaCents)), '', '', centro('______________________'), centro('Assinatura do operador')];
-        verCupom(L.join('\n'), 'Caixa fechado');
+        const b = $('#cfin', r); b.disabled = true;
+        try {
+          const d = await fecharNoServidor({ contado: lerContado(), observacao: $('#obs', r).value.trim(), contagem: lerContagem() });
+          closeModal(); render(); verRelatorio(d.relatorio);
+        } catch (x) { $('#ferr2', r).textContent = x.message; $('#ferr2', r).hidden = false; b.disabled = false; }
       };
     }, true);
   };
-  if (ab.length) confirmar('Ainda há comandas abertas', `Existem <b>${ab.length}</b> comandas abertas (${ab.map(c => c.numero).join(', ')}). Elas continuam abertas para o próximo caixa. Quer fechar mesmo assim?`, 'Continuar fechamento', go2);
+  if (ab.length) confirmar('Ainda há comandas abertas', `Existem <b>${ab.length}</b> comandas abertas (${ab.map(c => c.numero).join(', ')}). Elas continuam abertas para o próximo caixa e aparecem no relatório. Quer fechar mesmo assim?`, 'Continuar fechamento', go2);
   else go2();
 }
+
 function historicoFechamentos() {
   return `<div class="panel pad sect">
     <h3 class="h3">Fechamentos anteriores</h3>
     ${S.fechamentos.length ? `<div class="tbl-wrap"><table class="num">
-      <thead><tr><th>Fechado em</th><th>Operador</th><th class="r">Vendas</th><th class="r">Diferença</th></tr></thead>
-      <tbody>${S.fechamentos.map(f => `<tr><td>${dataHora(f.fechadoEm)}</td><td>${esc(f.operador)}</td><td class="r">${brl(f.totalVendasCents)}</td><td class="r ${f.diferencaCents ? 'diff-bad' : 'diff-ok'}">${f.diferencaCents ? (f.diferencaCents > 0 ? '+' : '') + brl(f.diferencaCents) : 'ok'}</td></tr>`).join('')}</tbody>
+      <thead><tr><th>Fechado em</th><th>Operador</th><th class="r">Vendas</th><th class="r">Diferença</th><th></th></tr></thead>
+      <tbody>${S.fechamentos.map(f => `<tr><td>${dataHora(f.fechadoEm)}</td><td>${esc(f.operador)}</td><td class="r">${brl(f.totalVendasCents)}</td><td class="r ${f.diferencaCents ? 'diff-bad' : 'diff-ok'}">${f.diferencaCents ? (f.diferencaCents > 0 ? '+' : '−') + brl(Math.abs(f.diferencaCents)) : 'ok'}</td><td class="r"><button class="btn" data-rel="${f.id}">Relatório</button></td></tr>`).join('')}</tbody>
     </table></div>` : `<p class="muted" style="margin:0">Nenhum fechamento ainda. Eles aparecem aqui com a sobra ou falta de cada dia.</p>`}
   </div>`;
 }
+function ligarRelatorios() {
+  document.querySelectorAll('[data-rel]').forEach(b => b.onclick = () => acao(async () => verRelatorio(await obterRelatorio(b.dataset.rel))));
+  $('#parcial') && ($('#parcial').onclick = () => acao(async () => verRelatorio(await obterRelatorio(null))));
+}
+
+function verRelatorio(rel) {
+  openModal(htmlRelatorio(rel), r => {
+    $('#relimp', r).onclick = () => verCupom(cupomRelatorio(rel), rel.parcial ? 'Conferência parcial' : 'Relatório de fechamento');
+  }, true);
+}
+function htmlRelatorio(rel) {
+  const c = rel.caixa, t = rel.totais, D = rel.dinheiro;
+  const quando = rel.parcial ? rel.emitidoEm : c.fechadoEm;
+  const tabela = (cab, linhas, pe = '') => `<div class="tbl-wrap"><table class="num"><thead><tr>${cab}</tr></thead><tbody>${linhas}</tbody>${pe}</table></div>`;
+  const formasUsadas = rel.formas.filter(f => f.qtd);
+  return `
+    <div class="m-head"><h3>${rel.parcial ? 'Conferência parcial do caixa' : 'Relatório de fechamento'}</h3>${xBtn}</div>
+    <div class="m-body rel">
+      <div class="rel-head">
+        <div><div class="h3">${esc(c.operador)}</div><div class="muted num">${dataHora(c.abertoEm)} até ${dataHora(quando)} · ${duracao(c.abertoEm, quando)}${c.fechadoPor && c.fechadoPor !== c.operador ? ` · fechado por ${esc(c.fechadoPor)}` : ''}</div></div>
+        ${rel.parcial ? '<span class="tag new">caixa ainda aberto</span>' : `<span class="tag ${t.diferencaCents ? 'bad' : 'ok'}">${t.diferencaCents ? sinal(t.diferencaCents) : 'caixa bateu'}</span>`}
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="label">Total vendido</span><div class="v num">${brl(t.vendasCents)}</div><span class="muted">${t.comandas} comandas pagas</span></div>
+        <div class="stat"><span class="label">Ticket médio</span><div class="v num">${brl(t.ticketMedioCents)}</div><span class="muted">por comanda</span></div>
+        <div class="stat"><span class="label">Comida por quilo</span><div class="v num">${kgTxt(t.gramas)} kg</div><span class="muted">${t.pratos} pratos</span></div>
+        <div class="stat"><span class="label">Cancelamentos</span><div class="v num">${t.canceladas}</div><span class="muted">${brl(t.canceladoCents)}</span></div>
+      </div>
+
+      <section><h4>Recebido por forma de pagamento</h4>
+        ${tabela('<th>Forma</th><th class="r">Pagamentos</th><th class="r">Valor recebido</th>',
+          (formasUsadas.length ? formasUsadas : rel.formas.slice(0, 1)).map(f => `<tr><td>${formaNome(f.forma)}</td><td class="r">${f.qtd}</td><td class="r">${brl(f.recebidoCents)}</td></tr>`).join(''),
+          `<tfoot><tr><td>Total recebido</td><td class="r">${rel.formas.reduce((s, f) => s + f.qtd, 0)}</td><td class="r">${brl(rel.formas.reduce((s, f) => s + f.recebidoCents, 0))}</td></tr>
+           ${D.trocoCents ? `<tr><td style="font-weight:400">Troco devolvido</td><td></td><td class="r" style="font-weight:400">− ${brl(D.trocoCents)}</td></tr>` : ''}
+           <tr><td>Total vendido</td><td></td><td class="r">${brl(t.vendasCents)}</td></tr></tfoot>`)}
+      </section>
+
+      <section><h4>Dinheiro na gaveta</h4>
+        <div class="conta num">
+          <div><span>Fundo de troco (abertura)</span><span>+ ${brl(D.fundoCents)}</span></div>
+          <div><span>Recebido em dinheiro</span><span>+ ${brl(D.recebidoCents)}</span></div>
+          <div><span>Troco dado</span><span>− ${brl(D.trocoCents)}</span></div>
+          <div><span>Suprimentos</span><span>+ ${brl(D.suprimentosCents)}</span></div>
+          <div><span>Sangrias (retiradas)</span><span>− ${brl(D.sangriasCents)}</span></div>
+          <div class="soma"><span>Deveria ter na gaveta</span><span>${brl(D.esperadoCents)}</span></div>
+          ${rel.parcial ? '' : `<div><span>Contado</span><span>${brl(D.contadoCents)}</span></div>
+          <div class="soma ${D.contadoCents - D.esperadoCents ? 'diff-bad' : 'diff-ok'}"><span>Diferença no dinheiro</span><span>${sinal(D.contadoCents - D.esperadoCents)}</span></div>`}
+        </div>
+      </section>
+
+      ${rel.conferencia ? `<section><h4>Conferência de cada forma</h4>
+        ${tabela('<th>Forma</th><th class="r">Sistema</th><th class="r">Contado</th><th class="r">Diferença</th>',
+          rel.conferencia.map(f => `<tr><td>${formaNome(f.forma)}</td><td class="r">${brl(f.esperadoCents)}</td><td class="r">${brl(f.contadoCents)}</td><td class="r ${f.diferencaCents ? 'diff-bad' : 'diff-ok'}">${sinal(f.diferencaCents)}</td></tr>`).join(''),
+          `<tfoot><tr><td>Total</td><td class="r">${brl(rel.conferencia.reduce((s, f) => s + f.esperadoCents, 0))}</td><td class="r">${brl(rel.conferencia.reduce((s, f) => s + f.contadoCents, 0))}</td><td class="r ${t.diferencaCents ? 'diff-bad' : 'diff-ok'}">${sinal(t.diferencaCents)}</td></tr></tfoot>`)}
+      </section>` : ''}
+
+      ${Object.keys(c.contagem || {}).length ? `<section><h4>Contagem da gaveta</h4>
+        ${tabela('<th>Nota/moeda</th><th class="r">Quantidade</th><th class="r">Valor</th>', Object.entries(c.contagem).sort((a, b) => b[0] - a[0]).map(([v, q]) => `<tr><td>${nomeCedula(+v)}</td><td class="r">${q}</td><td class="r">${brl(v * q)}</td></tr>`).join(''))}
+      </section>` : ''}
+
+      <section><h4>Sangrias e suprimentos</h4>
+        ${rel.movimentos.length ? tabela('<th>Hora</th><th>Tipo</th><th>Motivo</th><th>Quem</th><th class="r">Valor</th>',
+          rel.movimentos.map(m => `<tr><td>${hora(m.em)}</td><td>${m.tipo === 'sangria' ? 'Sangria' : 'Suprimento'}</td><td>${esc(m.motivo)}</td><td>${esc(m.usuario || '')}</td><td class="r ${m.tipo === 'sangria' ? 'diff-bad' : 'diff-ok'}">${m.tipo === 'sangria' ? '−' : '+'} ${brl(m.valorCents)}</td></tr>`).join(''))
+          : '<p class="muted" style="margin:0">Nenhuma sangria ou suprimento.</p>'}
+      </section>
+
+      <section><h4>Cancelamentos e alterações</h4>
+        ${rel.canceladas.length || rel.ocorrencias.length ? tabela('<th>Hora</th><th>Comanda</th><th>O que aconteceu</th><th>Quem</th><th class="r">Valor</th>',
+          [...rel.canceladas.map(x => ({ em: x.em, numero: x.numero, txt: `Comanda cancelada${x.motivo ? ': ' + x.motivo : ''}${x.autorizadoPor ? ` (autorizou ${x.autorizadoPor})` : ''}`, quem: x.usuario, v: x.totalCents })),
+           ...rel.ocorrencias.map(o => ({ em: o.em, numero: o.numero, txt: o.acao === 'reaberta' ? `Comanda reaberta${o.motivo ? ': ' + o.motivo : ''}${o.autorizadoPor ? ` (autorizou ${o.autorizadoPor})` : ''}` : `${o.acao === 'pesagem desfeita' ? 'Pesagem desfeita' : 'Item tirado'}: ${o.item}`, quem: o.usuario, v: o.valorCents }))]
+            .sort((a, b) => a.em - b.em).map(x => `<tr><td>${hora(x.em)}</td><td>${x.numero}</td><td>${esc(x.txt)}</td><td>${esc(x.quem || '')}</td><td class="r">${x.v ? brl(x.v) : ''}</td></tr>`).join(''))
+          : '<p class="muted" style="margin:0">Nada cancelado ou alterado.</p>'}
+      </section>
+
+      ${rel.pendentes.length ? `<section><h4>Comandas que ficaram abertas</h4>
+        <p class="note" style="margin:0 0 8px">Essas comandas ainda não foram pagas e passam para o próximo caixa.</p>
+        ${tabela('<th>Comanda</th><th>Aberta em</th><th class="r">Valor</th>', rel.pendentes.map(p => `<tr><td>${p.numero}</td><td>${dataHora(p.abertaEm)}</td><td class="r">${brl(p.totalCents)}</td></tr>`).join(''))}
+      </section>` : ''}
+
+      <section><h4>O que foi vendido</h4>
+        ${rel.produtos.length ? tabela('<th>Item</th><th class="r">Quantidade</th><th class="r">Valor</th>', rel.produtos.map(p => `<tr><td>${esc(p.nome)}</td><td class="r">${p.kg ? `${p.qtd} pratos · ${kgTxt(p.gramas)} kg` : p.qtd}</td><td class="r">${brl(p.valorCents)}</td></tr>`).join(''))
+          : '<p class="muted" style="margin:0">Nenhuma venda neste caixa.</p>'}
+      </section>
+
+      <details class="note"><summary>Comandas pagas (${rel.pagas.length})</summary>
+        ${rel.pagas.length ? tabela('<th>Hora</th><th>Comanda</th><th>Pagamento</th><th class="r">Total</th>', rel.pagas.map(p => `<tr><td>${hora(p.fechadaEm)}</td><td>${p.numero}</td><td>${p.pagamentos.map(x => `${formaNome(x.forma)} ${brl(x.valorCents)}`).join(' + ')}${p.trocoCents ? ` · troco ${brl(p.trocoCents)}` : ''}</td><td class="r">${brl(p.totalCents)}</td></tr>`).join('')) : ''}
+      </details>
+
+      ${c.observacao ? `<section><h4>Observação</h4><p class="note" style="margin:0">${esc(c.observacao)}</p></section>` : ''}
+    </div>
+    <div class="m-foot"><button class="btn" data-close>Fechar</button><button class="btn primary" id="relimp">Imprimir relatório</button></div>`;
+}
+function cupomRelatorio(rel) {
+  const c = rel.caixa, t = rel.totais, D = rel.dinheiro, L = [...cabecalho()];
+  const tit = s => L.push('', s);
+  L.push(centro(rel.parcial ? 'CONFERÊNCIA PARCIAL DE CAIXA' : 'FECHAMENTO DE CAIXA'), lr('Operador', c.operador), lr('Abertura', dataHora(c.abertoEm)),
+    lr(rel.parcial ? 'Emitido' : 'Fechamento', dataHora(rel.parcial ? rel.emitidoEm : c.fechadoEm)));
+  if (c.fechadoPor && c.fechadoPor !== c.operador) L.push(lr('Fechado por', c.fechadoPor));
+  L.push(lin());
+  tit('RESUMO'); L.push(lr('Comandas pagas', t.comandas), lr('Total vendido', brl(t.vendasCents)), lr('Ticket médio', brl(t.ticketMedioCents)), lr('Pratos / quilos', `${t.pratos} / ${kgTxt(t.gramas)} kg`), lr('Cancelamentos', `${t.canceladas} / ${n2(t.canceladoCents)}`), lin());
+  tit('FORMAS DE PAGAMENTO'); rel.formas.filter(f => f.qtd).forEach(f => L.push(lr(`${formaNome(f.forma)} (${f.qtd})`, n2(f.recebidoCents)))); L.push(lr('Total recebido', n2(rel.formas.reduce((s, f) => s + f.recebidoCents, 0)))); if (D.trocoCents) L.push(lr('Troco devolvido', '-' + n2(D.trocoCents))); L.push(lr('TOTAL VENDIDO', n2(t.vendasCents)), lin());
+  tit('DINHEIRO NA GAVETA'); L.push(lr('Fundo de troco', '+' + n2(D.fundoCents)), lr('Recebido em dinheiro', '+' + n2(D.recebidoCents)), lr('Troco dado', '-' + n2(D.trocoCents)),
+    lr('Suprimentos', '+' + n2(D.suprimentosCents)), lr('Sangrias', '-' + n2(D.sangriasCents)), lr('= Deveria ter', n2(D.esperadoCents)));
+  if (!rel.parcial) L.push(lr('Contado', n2(D.contadoCents)), lr('Diferença', sinalCurto(D.contadoCents - D.esperadoCents)));
+  L.push(lin());
+  if (rel.conferencia) { tit('CONFERÊNCIA (sistema / contado)'); rel.conferencia.forEach(f => L.push(lr(formaNome(f.forma), `${n2(f.esperadoCents)} / ${n2(f.contadoCents)}`), lr('  diferença', sinalCurto(f.diferencaCents)))); L.push(lr('DIFERENÇA TOTAL', sinalCurto(t.diferencaCents)), lin()); }
+  if (Object.keys(c.contagem || {}).length) { tit('CONTAGEM DA GAVETA'); Object.entries(c.contagem).sort((a, b) => b[0] - a[0]).forEach(([v, q]) => L.push(lr(`${q} x ${nomeCedula(+v)}`, n2(v * q)))); L.push(lin()); }
+  if (rel.movimentos.length) { tit('SANGRIAS E SUPRIMENTOS'); rel.movimentos.forEach(m => { L.push(lr(`${hora(m.em)} ${m.tipo === 'sangria' ? 'Sangria' : 'Suprimento'}`, (m.tipo === 'sangria' ? '-' : '+') + n2(m.valorCents))); quebra('  ' + m.motivo).forEach(l => L.push('  ' + l)); }); L.push(lin()); }
+  if (rel.canceladas.length) { tit('CANCELAMENTOS'); rel.canceladas.forEach(x => { L.push(lr(`${hora(x.em)} Comanda ${x.numero}`, n2(x.totalCents))); quebra(x.motivo).forEach(l => L.push('  ' + l)); }); L.push(lin()); }
+  if (rel.ocorrencias.length) { tit('ALTERAÇÕES'); rel.ocorrencias.forEach(o => quebra(`${hora(o.em)} Cmd ${o.numero}: ${o.acao}${o.item ? ' - ' + o.item : ''}${o.valorCents ? ' ' + n2(o.valorCents) : ''}`).forEach(l => L.push(l))); L.push(lin()); }
+  if (rel.pendentes.length) { tit('COMANDAS QUE FICARAM ABERTAS'); rel.pendentes.forEach(p => L.push(lr(`Comanda ${p.numero}`, n2(p.totalCents)))); L.push(lin()); }
+  if (rel.produtos.length) { tit('VENDIDO'); rel.produtos.forEach(p => L.push(lr(`${p.kg ? kgTxt(p.gramas) + 'kg' : p.qtd + 'x'} ${p.nome}`.slice(0, colunas() - 10), n2(p.valorCents)))); L.push(lin()); }
+  if (c.observacao) { tit('OBSERVAÇÃO'); quebra(c.observacao).forEach(l => L.push(l)); L.push(lin()); }
+  L.push('', '', centro('______________________'), centro('Operador'), '', '', centro('______________________'), centro('Gerente'));
+  return L.join('\n');
+}
+
+/* de onde vem o relatório: do servidor */
+async function obterRelatorio(id) { return (await api('GET', id ? `/api/caixas/${id}/relatorio` : '/api/caixa/relatorio')).relatorio; }
+const fecharNoServidor = dados => api('POST', '/api/caixa/fechar', dados);
 
 /* =========================================================
    RELATÓRIO DO DIA

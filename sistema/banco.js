@@ -151,6 +151,7 @@ function cpfValido(d) {
   return dv(9) === +d[9] && dv(10) === +d[10];
 }
 const novoId = () => crypto.randomUUID();
+const CEDULAS = [20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 25, 10, 5];
 const inteiro = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
 const texto = (v, max = 200) => String(v ?? '').trim().slice(0, max);
 
@@ -175,6 +176,10 @@ async function abrirBanco(opcoes = {}) {
   await A.transacao(async () => {
     if (A.tipo === 'postgres') await A.exec('SELECT pg_advisory_xact_lock(734211)');
     await A.exec(esquema(A.tipos));
+    const cols = A.tipo === 'postgres'
+      ? (await todos("SELECT column_name AS nome FROM information_schema.columns WHERE table_name = 'caixas'")).map(r => r.nome)
+      : (await todos("SELECT name AS nome FROM pragma_table_info('caixas')")).map(r => r.nome);
+    for (const c of ['observacao', 'contagem', 'pendentes']) if (!cols.includes(c)) await A.exec(`ALTER TABLE caixas ADD COLUMN ${c} TEXT`);
     if (!(await um('SELECT 1 AS x FROM categorias LIMIT 1'))) {
       for (const [k, [id, nome]] of [['Bebida', 'Bebidas'], ['Sobremesa', 'Sobremesas'], ['Outros', 'Outros']].entries()) await rodar('INSERT INTO categorias (id, nome, cor, ordem) VALUES (?, ?, ?, ?)', [id, nome, PALETA[k], k]);
       await rodar('INSERT INTO historico_preco (preco_kg_cents, em) VALUES (?, ?)', [9500, Date.now()]);
@@ -394,18 +399,75 @@ async function abrirBanco(opcoes = {}) {
     if (tipo === 'sangria' && valorCents > (await resumoCaixa(cx)).esperado.dinheiro) throw new ErroUso('A sangria é maior que o dinheiro que deveria estar na gaveta.');
     return Number((await um('INSERT INTO movimentos (caixa_id, tipo, valor_cents, motivo, em, usuario_id) VALUES (?, ?, ?, ?, ?, ?) RETURNING id', [cx.id, tipo, valorCents, motivo, Date.now(), quem.id])).id);
   });
-  const fechamentoPub = f => ({ id: Number(f.id), operador: f.operador_nome, abertoEm: f.aberto_em, fechadoEm: f.fechado_em, fechadoPor: f.fechado_por, fundoCents: f.fundo_cents, sangriasCents: f.sangrias_cents, suprimentosCents: f.suprimentos_cents, totalVendasCents: f.total_vendas_cents, comandas: f.comandas, esperado: JSON.parse(f.esperado || '{}'), contado: JSON.parse(f.contado || '{}'), diferencaCents: f.diferenca_cents });
-  const fecharCaixa = transacao(async (contado, quem) => {
+  const fechamentoPub = f => ({ id: Number(f.id), operador: f.operador_nome, abertoEm: f.aberto_em, fechadoEm: f.fechado_em, fechadoPor: f.fechado_por, fundoCents: f.fundo_cents, sangriasCents: f.sangrias_cents, suprimentosCents: f.suprimentos_cents, totalVendasCents: f.total_vendas_cents, comandas: f.comandas, esperado: JSON.parse(f.esperado || '{}'), contado: JSON.parse(f.contado || '{}'), diferencaCents: f.diferenca_cents, observacao: f.observacao || '' });
+  const comandasAbertasComTotal = async () => (await todos("SELECT c.numero, c.aberta_em, COALESCE(SUM(i.total_cents), 0) AS total FROM comandas c LEFT JOIN itens i ON i.comanda_id = c.id WHERE c.status = 'aberta' GROUP BY c.id, c.numero, c.aberta_em ORDER BY c.numero"))
+    .map(r => ({ numero: r.numero, abertaEm: r.aberta_em, totalCents: r.total }));
+  const fecharCaixa = transacao(async (contado, quem, extra = {}) => {
     const cx = await caixaAberto(); if (!cx) throw new ErroUso('O caixa já está fechado.', 409);
     const R = await resumoCaixa(cx);
     const ct = {};
     for (const f of FORMAS) { const v = contado && contado[f]; ct[f] = inteiro(v, 0, 100_000_000) ? v : 0; }
     const linhas = FORMAS.filter(f => R.esperado[f] || f === 'dinheiro');
     const diferenca = linhas.reduce((s, f) => s + ct[f] - R.esperado[f], 0);
-    await rodar('UPDATE caixas SET fechado_em = ?, fechado_por = ?, total_vendas_cents = ?, comandas = ?, sangrias_cents = ?, suprimentos_cents = ?, esperado = ?, contado = ?, diferenca_cents = ? WHERE id = ?',
-      [Date.now(), quem.nome, R.totalVendas, R.comandas, R.san, R.sup, JSON.stringify(R.esperado), JSON.stringify(ct), diferenca, cx.id]);
+    const contagem = {};
+    if (extra.contagem && typeof extra.contagem === 'object') for (const v of CEDULAS) { const q = Number(extra.contagem[v]); if (inteiro(q, 1, 100000)) contagem[v] = q; }
+    await rodar('UPDATE caixas SET fechado_em = ?, fechado_por = ?, total_vendas_cents = ?, comandas = ?, sangrias_cents = ?, suprimentos_cents = ?, esperado = ?, contado = ?, diferenca_cents = ?, observacao = ?, contagem = ?, pendentes = ? WHERE id = ?',
+      [Date.now(), quem.nome, R.totalVendas, R.comandas, R.san, R.sup, JSON.stringify(R.esperado), JSON.stringify(ct), diferenca, texto(extra.observacao, 500), JSON.stringify(contagem), JSON.stringify(await comandasAbertasComTotal()), cx.id]);
     return fechamentoPub(await um('SELECT * FROM caixas WHERE id = ?', [cx.id]));
   });
+
+  /* relatório completo de um caixa (aberto = conferência parcial; fechado = fechamento) */
+  async function relatorioCaixa(id) {
+    const cx = id ? await um('SELECT * FROM caixas WHERE id = ?', [Number(id)]) : await caixaAberto();
+    if (!cx) throw new ErroUso(id ? 'Fechamento não encontrado.' : 'O caixa está fechado.', 404);
+    const parcial = !cx.fechado_em, ini = cx.aberto_em, fim = cx.fechado_em || Date.now();
+    const lista = async (sql, ids) => ids.length ? todos(sql.replace('?LISTA', ids.map(() => '?').join(',')), ids) : [];
+    const pagasRows = await todos("SELECT * FROM comandas WHERE caixa_id = ? AND status = 'fechada' ORDER BY fechada_em", [cx.id]);
+    const ids = pagasRows.map(c => c.id);
+    const itens = await lista('SELECT * FROM itens WHERE comanda_id IN (?LISTA)', ids);
+    const pags = await lista('SELECT * FROM pagamentos WHERE comanda_id IN (?LISTA) ORDER BY id', ids);
+    const totalDeId = cid => itens.filter(i => i.comanda_id === cid).reduce((s, i) => s + i.total_cents, 0);
+    const pagas = pagasRows.map(c => ({ numero: c.numero, fechadaEm: c.fechada_em, totalCents: totalDeId(c.id), trocoCents: c.troco_cents, cpf: c.cpf,
+      pagamentos: pags.filter(p => p.comanda_id === c.id).map(p => ({ forma: p.forma, valorCents: p.valor_cents })) }));
+    const formas = FORMAS.map(f => { const ps = pags.filter(p => p.forma === f); return { forma: f, qtd: ps.length, recebidoCents: ps.reduce((s, p) => s + p.valor_cents, 0) }; });
+    const troco = pagasRows.reduce((s, c) => s + c.troco_cents, 0);
+    const movimentos = (await todos('SELECT m.em, m.tipo, m.valor_cents, m.motivo, u.nome AS usuario FROM movimentos m LEFT JOIN usuarios u ON u.id = m.usuario_id WHERE m.caixa_id = ? ORDER BY m.em', [cx.id]))
+      .map(m => ({ em: m.em, tipo: m.tipo, valorCents: m.valor_cents, motivo: m.motivo, usuario: m.usuario || '' }));
+    const soma = t => movimentos.filter(m => m.tipo === t).reduce((s, m) => s + m.valorCents, 0);
+    const recebidoDinheiro = formas.find(f => f.forma === 'dinheiro').recebidoCents;
+    const dinheiro = { fundoCents: cx.fundo_cents, recebidoCents: recebidoDinheiro, trocoCents: troco, suprimentosCents: soma('suprimento'), sangriasCents: soma('sangria') };
+    dinheiro.esperadoCents = dinheiro.fundoCents + dinheiro.recebidoCents - dinheiro.trocoCents + dinheiro.suprimentosCents - dinheiro.sangriasCents;
+    let conferencia = null;
+    if (!parcial) {
+      const esp = JSON.parse(cx.esperado || '{}'), ct = JSON.parse(cx.contado || '{}');
+      conferencia = FORMAS.filter(f => esp[f] || ct[f] || f === 'dinheiro').map(f => ({ forma: f, esperadoCents: esp[f] || 0, contadoCents: ct[f] || 0, diferencaCents: (ct[f] || 0) - (esp[f] || 0) }));
+      dinheiro.esperadoCents = esp.dinheiro ?? dinheiro.esperadoCents;
+      dinheiro.contadoCents = ct.dinheiro || 0;
+    }
+    const cancRows = await todos("SELECT * FROM comandas WHERE status = 'cancelada' AND cancelada_em >= ? AND cancelada_em <= ? ORDER BY cancelada_em", [ini, fim]);
+    const cancItens = await lista('SELECT comanda_id, total_cents FROM itens WHERE comanda_id IN (?LISTA)', cancRows.map(c => c.id));
+    const cancEv = await lista("SELECT * FROM eventos WHERE acao = 'cancelada' AND comanda_id IN (?LISTA)", cancRows.map(c => c.id));
+    const canceladas = cancRows.map(c => { const e = cancEv.filter(x => x.comanda_id === c.id).pop(), d = e ? JSON.parse(e.detalhe) : {};
+      return { numero: c.numero, em: c.cancelada_em, totalCents: cancItens.filter(i => i.comanda_id === c.id).reduce((s, i) => s + i.total_cents, 0), motivo: d.motivo || '', autorizadoPor: d.autorizadoPor || '', usuario: e ? e.usuario_nome : '' }; });
+    const ocorrencias = (await todos("SELECT e.*, c.numero FROM eventos e JOIN comandas c ON c.id = e.comanda_id WHERE e.em >= ? AND e.em <= ? AND e.acao IN ('item removido', 'pesagem desfeita', 'reaberta') ORDER BY e.em", [ini, fim]))
+      .map(e => { const d = JSON.parse(e.detalhe); return { em: e.em, numero: e.numero, acao: e.acao, item: d.item || '', valorCents: d.valorCents || 0, motivo: d.motivo || '', autorizadoPor: d.autorizadoPor || '', usuario: e.usuario_nome }; });
+    const pendentes = parcial ? await comandasAbertasComTotal() : JSON.parse(cx.pendentes || '[]');
+    const prod = new Map();
+    for (const i of itens) {
+      const k = i.tipo === 'kg' ? 'Refeição por quilo' : i.nome;
+      const p = prod.get(k) || { nome: k, kg: i.tipo === 'kg', qtd: 0, gramas: 0, valorCents: 0 };
+      p.qtd += i.tipo === 'kg' ? 1 : i.qtd; p.gramas += i.gramas || 0; p.valorCents += i.total_cents; prod.set(k, p);
+    }
+    const produtos = [...prod.values()].sort((a, b) => b.valorCents - a.valorCents);
+    const vendas = pagas.reduce((s, c) => s + c.totalCents, 0), kg = prod.get('Refeição por quilo');
+    return {
+      parcial, emitidoEm: Date.now(),
+      caixa: { id: Number(cx.id), operador: cx.operador_nome, abertoEm: cx.aberto_em, fechadoEm: cx.fechado_em || null, fechadoPor: cx.fechado_por || '', fundoCents: cx.fundo_cents, observacao: cx.observacao || '', contagem: JSON.parse(cx.contagem || '{}') },
+      totais: { vendasCents: vendas, comandas: pagas.length, ticketMedioCents: pagas.length ? Math.round(vendas / pagas.length) : 0, pratos: kg ? kg.qtd : 0, gramas: kg ? kg.gramas : 0,
+        canceladas: canceladas.length, canceladoCents: canceladas.reduce((s, c) => s + c.totalCents, 0), diferencaCents: parcial ? null : cx.diferenca_cents },
+      formas, dinheiro, conferencia, movimentos, pagas, canceladas, ocorrencias, pendentes, produtos,
+    };
+  }
 
   /* ---------- produtos e categorias ---------- */
   async function validarProduto(d, idAtual) {
@@ -529,7 +591,7 @@ async function abrirBanco(opcoes = {}) {
     minutosBloqueado, registrarFalha, limparFalhas, criarSessao, usuarioDaSessao, encerrarSessao,
     listarUsuarios: async () => (await todos('SELECT * FROM usuarios ORDER BY nome')).map(usuarioPub),
     abrirComanda, pesarNaBalanca, adicionarItem, mudarQtd, removerItem, descartarVazia, cancelarComanda, reabrirComanda, pagarComanda,
-    abrirCaixa, movimentarCaixa, fecharCaixa,
+    abrirCaixa, movimentarCaixa, fecharCaixa, relatorioCaixa,
     criarProduto, editarProduto, excluirProduto, carregarExemplos, criarCategoria, editarCategoria, excluirCategoria,
     mudarPrecoKg, salvarEmpresa, salvarImpressora, salvarChecklist, exportar,
     consulta: (sql, p) => um(sql, p),

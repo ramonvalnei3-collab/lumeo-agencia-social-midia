@@ -157,8 +157,29 @@ for (const [nomeBanco, opcoes] of bancos) describe(nomeBanco, () => {
     await operador('POST', '/api/caixa/movimentos', { tipo: 'suprimento', valorCents: 5000, motivo: 'moedas' });
     assert.equal((await operador('POST', '/api/caixa/movimentos', { tipo: 'sangria', valorCents: 99999999, motivo: 'cofre' })).status, 400);
     await operador('POST', '/api/caixa/movimentos', { tipo: 'sangria', valorCents: 10000, motivo: 'cofre' });
+    // conferência parcial (sem fechar)
+    const parc = (await operador('GET', '/api/caixa/relatorio')).d.relatorio;
+    assert.equal(parc.parcial, true);
+    assert.equal(parc.dinheiro.esperadoCents, 24500);
     // 200 + (100 − 5) + 50 − 100 = 245,00
-    const r = await operador('POST', '/api/caixa/fechar', { contado: { dinheiro: 24000 } });
+    const r = await operador('POST', '/api/caixa/fechar', { contado: { dinheiro: 24000 }, observacao: 'faltou troco de 5 reais', contagem: { 10000: 2, 2000: 2, 999: 3 } });
+    const rel = r.d.relatorio;
+    assert.equal(rel.parcial, false);
+    assert.equal(rel.dinheiro.fundoCents, 20000);
+    assert.equal(rel.dinheiro.recebidoCents, 10000);
+    assert.equal(rel.dinheiro.trocoCents, 500);
+    assert.equal(rel.dinheiro.suprimentosCents, 5000);
+    assert.equal(rel.dinheiro.sangriasCents, 10000);
+    assert.equal(rel.dinheiro.contadoCents, 24000);
+    assert.equal(rel.movimentos.length, 2);
+    assert.equal(rel.totais.comandas, 1);
+    assert.equal(rel.totais.pratos, 1);
+    assert.equal(rel.canceladas.length, 1, 'a comanda 12 foi cancelada com o caixa aberto');
+    assert.ok(rel.ocorrencias.some(o => o.acao === 'reaberta'));
+    assert.equal(rel.caixa.observacao, 'faltou troco de 5 reais');
+    assert.deepEqual(rel.caixa.contagem, { 10000: 2, 2000: 2 }, 'só guarda notas que existem');
+    const antigo = (await gerente('GET', `/api/caixas/${rel.caixa.id}/relatorio`)).d.relatorio;
+    assert.equal(antigo.totais.diferencaCents, -500);
     assert.equal(r.status, 200);
     assert.equal(r.d.fechamento.esperado.dinheiro, 24500);
     assert.equal(r.d.fechamento.diferencaCents, -500);
