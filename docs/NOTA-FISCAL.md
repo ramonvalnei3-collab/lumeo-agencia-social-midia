@@ -31,18 +31,19 @@ falta a parte que só a empresa e o contador conseguem fazer. Quanto antes come�
 Anexe o arquivo **`tabela-fiscal-produtos.csv`** (abre no Excel). Ele tem a lista de exemplo do sistema;
 troque/complete com os produtos reais antes de mandar.
 
-## 2. Escolher o serviço emissor
+## 2. Como o sistema vai falar com a SEFAZ (custo)
 
-O sistema não fala direto com a SEFAZ: ele usa uma empresa intermediária, que cuida da assinatura com o certificado,
-das regras de cada estado e da contingência sem internet. Opções conhecidas: **Focus NFe**, **Nuvem Fiscal**,
-**PlugNotas (TecnoSpeed)**, **WebmaniaBR**.
+| Caminho | Custo mensal | Prós | Contras |
+|---|---|---|---|
+| **Serviço emissor pago** (Focus NFe, PlugNotas, WebmaniaBR…) | A partir de ~R$ 90/mês (Focus NFe Solo, nov/2026; confirmar franquia de notas) | Mais rápido de ligar; eles cuidam das mudanças de regra e da contingência | Mensalidade |
+| **Ligação direta com a SEFAZ** (feita no próprio sistema) | R$ 0 | Sem mensalidade | Mais tempo de desenvolvimento; nós cuidamos das atualizações de regra (Notas Técnicas) |
+| Aplicativo gratuito do estado (só alguns estados, ex.: ES) | R$ 0 | Grátis | Fica fora do sistema: nota digitada à mão, não resolve |
 
-O que fazer: crie uma conta de **teste (homologação)** em uma delas e compare preço por mês e por nota.
-Minha sugestão para começar é **Focus NFe** ou **Nuvem Fiscal**: as duas têm documentação clara e ambiente de testes.
-Quando escolher, o sistema recebe a chave de acesso da API (cadastrada na Vercel, não no código).
+Os testes (homologação) não têm custo em nenhum caminho. A mensalidade do emissor pode entrar no valor cobrado do cliente.
 
 ## 3. Cuidados
 
 - **Certificado e senha** vão só no painel do serviço emissor ou no servidor, nunca por e-mail, WhatsApp ou chat.
 - Comece em **homologação** (notas de teste, sem valor fiscal). Só passe para **produção** depois de testar.
+- **NFC-e só para pessoa física:** desde nov/2025 a NFC-e não pode sair no CNPJ de empresa (Ajuste SINIEF 11/2025). O sistema já recusa CNPJ e confere o CPF. Empresa que pedir nota precisa de NF-e (modelo 55).
 - NFC-e emitida não se edita: corrige-se cancelando (prazo curto, em geral 30 min) e emitindo outra.

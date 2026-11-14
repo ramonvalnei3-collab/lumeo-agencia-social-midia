@@ -144,6 +144,12 @@ function confereSenha(senha, guardado) {
 const HASH_FALSO = 'scrypt$16384$8$1$AAAAAAAAAAAAAAAAAAAAAA==$' + 'A'.repeat(86) + '==';
 
 const precoPrato = (gramas, precoKgCents) => Math.round(gramas * precoKgCents / 1000);
+/* CPF: 11 números, não todos iguais, com os dois dígitos verificadores certos */
+function cpfValido(d) {
+  if (!/^\d{11}$/.test(d) || /^(\d)\1{10}$/.test(d)) return false;
+  const dv = n => { let s = 0; for (let i = 0; i < n; i++) s += +d[i] * (n + 1 - i); const r = (s * 10) % 11; return r === 10 ? 0 : r; };
+  return dv(9) === +d[9] && dv(10) === +d[10];
+}
 const novoId = () => crypto.randomUUID();
 const inteiro = (v, min, max) => Number.isInteger(v) && v >= min && v <= max;
 const texto = (v, max = 200) => String(v ?? '').trim().slice(0, max);
@@ -357,7 +363,8 @@ async function abrirBanco(opcoes = {}) {
     const troco = soma - total;
     if (troco > dinheiro) throw new ErroUso('Troco só em dinheiro: cartão, Pix e vale não podem passar do total.');
     const doc = String(cpf || '').replace(/\D/g, '');
-    if (doc && doc.length !== 11 && doc.length !== 14) throw new ErroUso('CPF ou CNPJ incompleto.');
+    if (doc.length === 14) throw new ErroUso('A NFC-e não pode sair no CNPJ de empresa (regra desde nov/2025). Deixe em branco ou use o CPF; para empresa é preciso NF-e.');
+    if (doc && !cpfValido(doc)) throw new ErroUso('CPF inválido. Confira os 11 números ou deixe em branco.');
     for (const p of pagamentos) await rodar('INSERT INTO pagamentos (comanda_id, forma, valor_cents) VALUES (?, ?, ?)', [c.id, p.forma, p.valorCents]);
     await rodar("UPDATE comandas SET status = 'fechada', fechada_em = ?, troco_cents = ?, cpf = ?, caixa_id = ? WHERE id = ?", [Date.now(), troco, texto(cpf, 20), cx.id, c.id]);
     return troco;

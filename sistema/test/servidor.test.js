@@ -131,7 +131,10 @@ for (const [nomeBanco, opcoes] of bancos) describe(nomeBanco, () => {
     assert.equal((await operador('POST', '/api/caixa/abrir', { fundoCents: 20000 })).status, 409);
     assert.equal((await operador('POST', `/api/comandas/${comandaId}/pagar`, { pagamentos: [{ forma: 'pix', valorCents: 5000 }] })).status, 400);
     assert.equal((await operador('POST', `/api/comandas/${comandaId}/pagar`, { pagamentos: [{ forma: 'credito', valorCents: 20000 }] })).status, 400);
-    const r = await operador('POST', `/api/comandas/${comandaId}/pagar`, { pagamentos: [{ forma: 'pix', valorCents: 5000 }, { forma: 'dinheiro', valorCents: 5000 }] });
+    const pags = [{ forma: 'pix', valorCents: 5000 }, { forma: 'dinheiro', valorCents: 5000 }];
+    assert.equal((await operador('POST', `/api/comandas/${comandaId}/pagar`, { pagamentos: pags, cpf: '63.062.421/0001-67' })).status, 400, 'NFC-e não aceita CNPJ');
+    assert.equal((await operador('POST', `/api/comandas/${comandaId}/pagar`, { pagamentos: pags, cpf: '123.456.789-00' })).status, 400, 'CPF com dígito errado');
+    const r = await operador('POST', `/api/comandas/${comandaId}/pagar`, { pagamentos: pags, cpf: '529.982.247-25' });
     assert.equal(r.status, 200);
     assert.equal(r.d.trocoCents, 373);
     assert.equal(r.d.estado.comandas.find(x => x.id === comandaId).status, 'fechada');
